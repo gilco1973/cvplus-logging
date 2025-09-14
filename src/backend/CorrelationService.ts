@@ -90,7 +90,7 @@ export class CorrelationService {
    * Clear the current correlation context
    */
   static clear(): void {
-    this.asyncLocalStorage.exitWith(undefined);
+    this.asyncLocalStorage.disable();
   }
 
   /**

@@ -16,8 +16,10 @@
  */
 
 // Core services
-export { LoggerFactory } from './LoggerFactory';
-export { CorrelationService } from './CorrelationService';
+import { LoggerFactory } from './LoggerFactory';
+import { CorrelationService } from './CorrelationService';
+export { LoggerFactory };
+export { CorrelationService };
 export { PiiRedaction } from './PiiRedaction';
 export { LogFormatter } from './LogFormatter';
 
@@ -32,7 +34,7 @@ export { AuditTrail, globalAuditTrail } from './AuditTrail';
 export { LogArchive, globalLogArchive } from './LogArchive';
 
 // Types and interfaces
-export * from './types';
+export * from './types/index';
 
 // Enums for data models
 export { AlertConditionType } from './AlertRule';
@@ -40,8 +42,9 @@ export { AuditEventType } from './AuditTrail';
 export { ArchiveStorageType, CompressionType } from './LogArchive';
 
 // Package logger factory and implementations
+import PackageLoggerFactoryDefault from './PackageLoggerFactory';
+export { PackageLoggerFactoryDefault as PackageLoggerFactory };
 export {
-  PackageLoggerFactory,
   BasePackageLogger,
   AnalyticsLogger,
   PremiumLogger,
@@ -61,27 +64,12 @@ export {
   packageLogging
 } from './PackageLoggerFactory';
 
-// Re-export commonly used types for convenience
-export type {
-  Logger,
-  LoggerConfig,
-  LogEntry,
-  LogStream,
-  AlertRule,
-  AuditTrail,
-  PiiRedactionConfig,
-  TransportConfig
-} from './types';
-
-export {
-  LogLevel,
-  LogDomain
-} from './types';
+// Note: All types are now exported via export * from './types/index';
 
 /**
  * Quick start utility for creating a logger with sensible defaults
  */
-export function createLogger(serviceName: string, level: LogLevel = LogLevel.INFO) {
+export function createLogger(serviceName: string, level?: import('./types/index').LogLevel) {
   return LoggerFactory.createLogger(serviceName, { level });
 }
 

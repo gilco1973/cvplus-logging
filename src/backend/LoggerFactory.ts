@@ -1,155 +1,70 @@
 /**
- * T018: LoggerFactory with Winston backend in packages/core/src/logging/LoggerFactory.ts
- *
- * Central factory for creating and managing Winston-based loggers across CVPlus platform
- * Implements singleton pattern for logger instances per service
+ * T022: LoggerFactory implementation
+ * CVPlus Logging System - Logger Factory for Service Management
  */
 
-import winston from 'winston';
-import { LogLevel, LoggerConfig, Logger as ILogger } from './types';
-import { CorrelationService } from './CorrelationService';
-import { PiiRedaction } from './PiiRedaction';
-import { LogFormatter } from './LogFormatter';
+import { Logger as WinstonLogger } from 'winston';
+import {
+  LoggerConfig,
+  LoggerFactoryConfig,
+  LogLevel,
+  DEFAULT_FACTORY_CONFIG,
+  ILogger
+} from './types/index';
+import { BaseLogger } from './core/BaseLogger';
 
-/**
- * Logger wrapper that implements our Logger interface
- */
-class CVPlusLogger implements ILogger {
-  private winstonLogger: winston.Logger;
-  private serviceName: string;
-  private contextData: Record<string, unknown> = {};
-
-  constructor(winstonLogger: winston.Logger, serviceName: string) {
-    this.winstonLogger = winstonLogger;
-    this.serviceName = serviceName;
-  }
-
-  debug(message: string, context: Record<string, unknown> = {}): void {
-    this.log(LogLevel.DEBUG, message, context);
-  }
-
-  info(message: string, context: Record<string, unknown> = {}): void {
-    this.log(LogLevel.INFO, message, context);
-  }
-
-  warn(message: string, context: Record<string, unknown> = {}): void {
-    this.log(LogLevel.WARN, message, context);
-  }
-
-  error(message: string, context: Record<string, unknown> = {}, error?: Error): void {
-    const errorContext = error ? {
-      ...context,
-      error: {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      }
-    } : context;
-
-    this.log(LogLevel.ERROR, message, errorContext);
-  }
-
-  fatal(message: string, context: Record<string, unknown> = {}, error?: Error): void {
-    const errorContext = error ? {
-      ...context,
-      error: {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      }
-    } : context;
-
-    this.log(LogLevel.FATAL, message, errorContext);
-  }
-
-  security(message: string, context: Record<string, unknown> = {}): void {
-    this.log(LogLevel.WARN, message, { ...context, domain: 'security' });
-  }
-
-  performance(message: string, metrics?: any, context: Record<string, unknown> = {}): void {
-    const perfContext = metrics ? { ...context, performance: metrics } : context;
-    this.log(LogLevel.INFO, message, { ...perfContext, domain: 'performance' });
-  }
-
-  audit(action: string, resource: string, outcome: 'success' | 'failure', context: Record<string, unknown> = {}): void {
-    const auditContext = {
-      ...context,
-      action,
-      resource,
-      outcome,
-      domain: 'audit'
-    };
-    this.log(LogLevel.INFO, `Audit: ${action} on ${resource}`, auditContext);
-  }
-
-  async withCorrelationId(correlationId: string, callback: () => void | Promise<void>): Promise<void> {
-    return CorrelationService.withCorrelationId(correlationId, callback);
-  }
-
-  setContext(context: Record<string, unknown>): void {
-    this.contextData = { ...this.contextData, ...context };
-  }
-
-  clearContext(): void {
-    this.contextData = {};
-  }
-
-  private log(level: LogLevel, message: string, context: Record<string, unknown> = {}): void {
-    const correlationId = CorrelationService.getCurrentId() || CorrelationService.generateId();
-
-    const logEntry = {
-      timestamp: new Date().toISOString(),
-      level,
-      message,
-      correlationId,
-      domain: context.domain || 'system',
-      package: this.serviceName,
-      context: { ...this.contextData, ...context }
-    };
-
-    // Apply PII redaction if enabled
-    const redactedEntry = PiiRedaction.isEnabled() ? PiiRedaction.redactLogEntry(logEntry) : logEntry;
-
-    // Log through Winston with formatted entry
-    this.winstonLogger.log(level, redactedEntry.message, redactedEntry);
-  }
-}
-
-/**
- * Factory class for creating and managing logger instances
- */
 export class LoggerFactory {
-  private static loggers: Map<string, CVPlusLogger> = new Map();
-  private static defaultConfig: LoggerConfig = {
-    level: LogLevel.INFO,
-    environment: process.env.NODE_ENV || 'development',
-    enableConsole: true,
-    enableFile: true,
-    enableFirebase: false,
-    enablePiiRedaction: true
-  };
+  private static loggers: Map<string, BaseLogger> = new Map();
+  private static config: Required<LoggerFactoryConfig> = DEFAULT_FACTORY_CONFIG;
+  private static initialized = false;
 
   /**
-   * Create or retrieve a logger for a specific service
+   * Initialize the factory with global configuration
    */
-  static createLogger(serviceName: string, config: LoggerConfig = {}): CVPlusLogger {
-    if (this.loggers.has(serviceName)) {
-      return this.loggers.get(serviceName)!;
+  static initialize(config: Partial<LoggerFactoryConfig> = {}): void {
+    LoggerFactory.config = { ...DEFAULT_FACTORY_CONFIG, ...config };
+    LoggerFactory.initialized = true;
+  }
+
+  /**
+   * Create or retrieve a logger for a service
+   */
+  static createLogger(serviceName: string, config: Partial<LoggerConfig> = {}): BaseLogger {
+    // Ensure factory is initialized
+    if (!LoggerFactory.initialized) {
+      LoggerFactory.initialize();
     }
 
-    const mergedConfig = { ...this.defaultConfig, ...config };
-    const winstonLogger = this.createWinstonLogger(serviceName, mergedConfig);
-    const logger = new CVPlusLogger(winstonLogger, serviceName);
+    // Return existing logger if found
+    if (LoggerFactory.loggers.has(serviceName)) {
+      return LoggerFactory.loggers.get(serviceName)!;
+    }
 
-    this.loggers.set(serviceName, logger);
+    // Merge service config with factory defaults
+    const mergedConfig: Partial<LoggerConfig> = {
+      level: LoggerFactory.config.defaultLevel,
+      enableConsole: true,
+      enableFile: false,
+      enableFirebase: false,
+      redactPII: LoggerFactory.config.enablePIIRedaction,
+      metadata: { ...LoggerFactory.config.globalContext },
+      ...config
+    };
+
+    // Create new logger
+    const logger = new BaseLogger(serviceName, mergedConfig);
+
+    // Store for future retrieval
+    LoggerFactory.loggers.set(serviceName, logger);
+
     return logger;
   }
 
   /**
-   * Get an existing logger by service name
+   * Get existing logger by service name
    */
-  static getLogger(serviceName: string): CVPlusLogger {
-    const logger = this.loggers.get(serviceName);
+  static getLogger(serviceName: string): BaseLogger {
+    const logger = LoggerFactory.loggers.get(serviceName);
     if (!logger) {
       throw new Error(`Logger not found for service: ${serviceName}`);
     }
@@ -157,86 +72,230 @@ export class LoggerFactory {
   }
 
   /**
-   * Get all created loggers
+   * Check if logger exists for service
    */
-  static getAllLoggers(): Record<string, CVPlusLogger> {
-    const result: Record<string, CVPlusLogger> = {};
-    this.loggers.forEach((logger, serviceName) => {
+  static hasLogger(serviceName: string): boolean {
+    return LoggerFactory.loggers.has(serviceName);
+  }
+
+  /**
+   * Get all registered loggers
+   */
+  static getAllLoggers(): Record<string, BaseLogger> {
+    const result: Record<string, BaseLogger> = {};
+    LoggerFactory.loggers.forEach((logger, serviceName) => {
       result[serviceName] = logger;
     });
     return result;
   }
 
   /**
-   * Update log level for a specific logger
+   * Update log level for specific logger
    */
+  static updateLogLevel(serviceName: string, level: LogLevel): void;
+  static updateLogLevel(level: LogLevel): void;
   static updateLogLevel(serviceNameOrLevel: string | LogLevel, level?: LogLevel): void {
     if (typeof serviceNameOrLevel === 'string' && level) {
       // Update specific logger
-      const logger = this.loggers.get(serviceNameOrLevel);
+      const logger = LoggerFactory.loggers.get(serviceNameOrLevel);
       if (logger) {
-        (logger as any).winstonLogger.level = level;
+        logger.setLevel(level);
       }
     } else if (typeof serviceNameOrLevel === 'string' && !level) {
       // Update all loggers
       const newLevel = serviceNameOrLevel as LogLevel;
-      this.loggers.forEach((logger) => {
-        (logger as any).winstonLogger.level = newLevel;
+      LoggerFactory.loggers.forEach(logger => {
+        logger.setLevel(newLevel);
+      });
+      LoggerFactory.config.defaultLevel = newLevel;
+    }
+  }
+
+  /**
+   * Remove logger for service
+   */
+  static removeLogger(serviceName: string): boolean {
+    const logger = LoggerFactory.loggers.get(serviceName);
+    if (logger) {
+      logger.destroy();
+      LoggerFactory.loggers.delete(serviceName);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Clear all loggers
+   */
+  static reset(): void {
+    LoggerFactory.loggers.forEach(logger => {
+      logger.destroy();
+    });
+    LoggerFactory.loggers.clear();
+  }
+
+  /**
+   * Get factory configuration
+   */
+  static getConfig(): Required<LoggerFactoryConfig> {
+    return { ...LoggerFactory.config };
+  }
+
+  /**
+   * Update factory configuration
+   */
+  static updateConfig(newConfig: Partial<LoggerFactoryConfig>): void {
+    LoggerFactory.config = { ...LoggerFactory.config, ...newConfig };
+
+    // Apply configuration changes to existing loggers
+    if (newConfig.defaultLevel) {
+      LoggerFactory.loggers.forEach(logger => {
+        logger.setLevel(newConfig.defaultLevel!);
       });
     }
   }
 
   /**
-   * Clear all loggers (primarily for testing)
+   * Get logger count
    */
-  static reset(): void {
-    this.loggers.clear();
+  static getLoggerCount(): number {
+    return LoggerFactory.loggers.size;
   }
 
   /**
-   * Create Winston logger with appropriate transports
+   * Get logger names
    */
-  private static createWinstonLogger(serviceName: string, config: LoggerConfig): winston.Logger {
-    const transports: winston.transport[] = [];
+  static getLoggerNames(): string[] {
+    return Array.from(LoggerFactory.loggers.keys());
+  }
 
-    // Console transport
-    if (config.enableConsole) {
-      transports.push(new winston.transports.Console({
-        level: config.level,
-        format: winston.format.combine(
-          winston.format.colorize({ all: true }),
-          winston.format.timestamp(),
-          winston.format.printf((info) => {
-            return LogFormatter.formatForConsole(info as any);
-          })
-        )
-      }));
-    }
+  /**
+   * Create logger with Winston instance (for compatibility)
+   */
+  static createWinstonLogger(serviceName: string, config: Partial<LoggerConfig> = {}): WinstonLogger {
+    const logger = LoggerFactory.createLogger(serviceName, config);
+    return (logger as any).winston as WinstonLogger;
+  }
 
-    // File transport
-    if (config.enableFile) {
-      transports.push(new winston.transports.File({
-        level: config.level,
-        filename: config.filePath || `logs/${serviceName}.log`,
-        maxsize: 5242880, // 5MB
-        maxFiles: 5,
-        format: winston.format.combine(
-          winston.format.timestamp(),
-          winston.format.printf((info) => {
-            return LogFormatter.formatForFile(info as any);
-          })
-        )
-      }));
-    }
+  /**
+   * Batch create loggers for multiple services
+   */
+  static createLoggers(
+    services: Array<{ name: string; config?: Partial<LoggerConfig> }>
+  ): Record<string, BaseLogger> {
+    const result: Record<string, BaseLogger> = {};
 
-    return winston.createLogger({
-      level: config.level,
-      defaultMeta: {
-        service: serviceName,
-        environment: config.environment
-      },
-      transports,
-      exitOnError: false
+    services.forEach(({ name, config = {} }) => {
+      result[name] = LoggerFactory.createLogger(name, config);
     });
+
+    return result;
+  }
+
+  /**
+   * Health check for all loggers
+   */
+  static healthCheck(): {
+    healthy: boolean;
+    loggerCount: number;
+    issues: string[];
+  } {
+    const issues: string[] = [];
+    let healthy = true;
+
+    try {
+      // Check if loggers are responding
+      LoggerFactory.loggers.forEach((logger, serviceName) => {
+        try {
+          // Test if logger can create log entries
+          logger.debug('Health check test log', { healthCheck: true });
+        } catch (error) {
+          issues.push(`Logger ${serviceName} failed health check: ${(error as Error).message}`);
+          healthy = false;
+        }
+      });
+
+      // Check factory state
+      if (!LoggerFactory.initialized) {
+        issues.push('LoggerFactory not initialized');
+        healthy = false;
+      }
+
+    } catch (error) {
+      issues.push(`Health check failed: ${(error as Error).message}`);
+      healthy = false;
+    }
+
+    return {
+      healthy,
+      loggerCount: LoggerFactory.loggers.size,
+      issues
+    };
+  }
+
+  /**
+   * Create specialized logger with predefined configuration
+   */
+  static createSpecializedLogger(
+    serviceName: string,
+    specialization: 'security' | 'performance' | 'audit' | 'business',
+    config: Partial<LoggerConfig> = {}
+  ): BaseLogger {
+    const specializationConfigs = {
+      security: {
+        level: LogLevel.WARN,
+        enableFile: true,
+        filePath: './logs/security.log',
+        metadata: { specialization: 'security' }
+      },
+      performance: {
+        level: LogLevel.INFO,
+        enableFile: true,
+        filePath: './logs/performance.log',
+        metadata: { specialization: 'performance' }
+      },
+      audit: {
+        level: LogLevel.INFO,
+        enableFile: true,
+        filePath: './logs/audit.log',
+        metadata: { specialization: 'audit' }
+      },
+      business: {
+        level: LogLevel.INFO,
+        enableFile: true,
+        filePath: './logs/business.log',
+        metadata: { specialization: 'business' }
+      }
+    };
+
+    const specializationConfig = specializationConfigs[specialization];
+    const mergedConfig = { ...specializationConfig, ...config };
+
+    return LoggerFactory.createLogger(`${serviceName}-${specialization}`, mergedConfig);
+  }
+
+  /**
+   * Graceful shutdown - flush and close all loggers
+   */
+  static async shutdown(): Promise<void> {
+    const shutdownPromises: Promise<void>[] = [];
+
+    LoggerFactory.loggers.forEach(logger => {
+      shutdownPromises.push(
+        new Promise<void>((resolve) => {
+          try {
+            logger.destroy();
+            resolve();
+          } catch (error) {
+            // Log error but continue shutdown
+            console.error(`Error shutting down logger:`, error);
+            resolve();
+          }
+        })
+      );
+    });
+
+    await Promise.all(shutdownPromises);
+    LoggerFactory.loggers.clear();
   }
 }

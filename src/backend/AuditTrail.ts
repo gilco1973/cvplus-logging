@@ -7,7 +7,7 @@
 
 import { EventEmitter } from 'events';
 import { createHash, createHmac } from 'crypto';
-import { LogEntry, AuditTrail as IAuditTrail, AuditAction, AuditSeverity } from './types';
+import { LogEntry, AuditTrail as IAuditTrail, AuditAction, AlertSeverity } from './types/index';
 
 /**
  * Audit event types based on common compliance frameworks
@@ -78,7 +78,7 @@ export interface AuditEntry {
   /**
    * Severity level
    */
-  severity: AuditSeverity;
+  severity: AlertSeverity;
 
   /**
    * User who performed the action
@@ -210,13 +210,18 @@ export interface RetentionPolicy {
   /**
    * Severity levels this policy applies to
    */
-  severities?: AuditSeverity[];
+  severities?: AlertSeverity[];
 }
 
 /**
  * Audit trail configuration
  */
 export interface AuditTrailConfig {
+  /**
+   * Unique identifier for the audit trail
+   */
+  id?: string;
+
   /**
    * Enable audit trail
    */
@@ -259,7 +264,7 @@ export interface AuditTrailConfig {
 export interface AuditTrailStats {
   totalEntries: number;
   entriesByType: Record<AuditEventType, number>;
-  entriesBySeverity: Record<AuditSeverity, number>;
+  entriesBySeverity: Record<AlertSeverity, number>;
   entriesByResult: Record<string, number>;
   oldestEntry?: Date;
   newestEntry?: Date;
@@ -273,6 +278,17 @@ export interface AuditTrailStats {
  * Audit trail implementation
  */
 export class AuditTrail extends EventEmitter implements IAuditTrail {
+  // IAuditTrail interface properties
+  public readonly id: string;
+  public readonly timestamp: string;
+  public readonly userId: string;
+  public readonly action: string;
+  public readonly resource: string;
+  public readonly outcome: 'success' | 'failure';
+  public readonly details: Record<string, any>;
+  public readonly correlationId?: string;
+  public readonly ipAddress?: string;
+  public readonly userAgent?: string;
   private readonly config: AuditTrailConfig;
   private readonly entries: AuditEntry[] = [];
   private readonly stats: AuditTrailStats;
@@ -282,10 +298,19 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
     super();
 
     this.config = { ...config };
+
+    // Initialize IAuditTrail interface properties (with defaults)
+    this.id = config.id || `audit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    this.timestamp = new Date().toISOString();
+    this.userId = 'system'; // Default system user
+    this.action = 'initialize';
+    this.resource = 'audit-trail';
+    this.outcome = 'success';
+    this.details = { config: this.config };
     this.stats = {
       totalEntries: 0,
       entriesByType: {} as Record<AuditEventType, number>,
-      entriesBySeverity: {} as Record<AuditSeverity, number>,
+      entriesBySeverity: {} as Record<AlertSeverity, number>,
       entriesByResult: {},
       averageEntriesPerDay: 0,
       integrityChecksPassed: 0,
@@ -297,7 +322,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
       this.stats.entriesByType[type] = 0;
     });
 
-    Object.values(AuditSeverity).forEach(severity => {
+    Object.values(AlertSeverity).forEach(severity => {
       this.stats.entriesBySeverity[severity] = 0;
     });
   }
@@ -309,7 +334,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
     eventType: AuditEventType,
     action: AuditAction,
     options: {
-      severity?: AuditSeverity;
+      severity?: AlertSeverity;
       userId?: string;
       userEmail?: string;
       sessionId?: string;
@@ -335,7 +360,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
       id: this.generateId(),
       timestamp: new Date(),
       eventType,
-      severity: options.severity || AuditSeverity.INFO,
+      severity: options.severity || AlertSeverity.INFO,
       userId: options.userId,
       userEmail: options.userEmail,
       sessionId: options.sessionId,
@@ -377,7 +402,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
   }): string {
     const eventType = auditMapping?.eventType || this.inferEventType(logEntry);
     const action = auditMapping?.action || AuditAction.READ;
-    const severity = this.mapLogLevelToAuditSeverity(logEntry.level);
+    const severity = this.mapLogLevelToAlertSeverity(logEntry.level);
 
     return this.logEvent(eventType, action, {
       severity,
@@ -385,7 +410,11 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
       sessionId: logEntry.sessionId,
       description: logEntry.message,
       context: logEntry.context,
-      error: logEntry.error,
+      error: logEntry.error ? {
+        code: logEntry.error.code || 'UNKNOWN',
+        message: logEntry.error.message,
+        stack: logEntry.error.stack
+      } : undefined,
       complianceTags: auditMapping?.complianceTags || []
     });
   }
@@ -488,20 +517,20 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
   /**
    * Map log level to audit severity
    */
-  private mapLogLevelToAuditSeverity(level: string): AuditSeverity {
+  private mapLogLevelToAlertSeverity(level: string): AlertSeverity {
     switch (level.toLowerCase()) {
       case 'debug':
-        return AuditSeverity.LOW;
+        return AlertSeverity.LOW;
       case 'info':
-        return AuditSeverity.INFO;
+        return AlertSeverity.INFO;
       case 'warn':
-        return AuditSeverity.MEDIUM;
+        return AlertSeverity.MEDIUM;
       case 'error':
-        return AuditSeverity.HIGH;
+        return AlertSeverity.HIGH;
       case 'fatal':
-        return AuditSeverity.CRITICAL;
+        return AlertSeverity.CRITICAL;
       default:
-        return AuditSeverity.INFO;
+        return AlertSeverity.INFO;
     }
   }
 
@@ -544,7 +573,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
    */
   query(filters: {
     eventTypes?: AuditEventType[];
-    severities?: AuditSeverity[];
+    severities?: AlertSeverity[];
     userIds?: string[];
     dateRange?: { start: Date; end: Date };
     actions?: AuditAction[];
@@ -713,7 +742,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
       this.stats.entriesByType[type] = 0;
     });
 
-    Object.values(AuditSeverity).forEach(severity => {
+    Object.values(AlertSeverity).forEach(severity => {
       this.stats.entriesBySeverity[severity] = 0;
     });
 
@@ -740,7 +769,7 @@ export const globalAuditTrail = new AuditTrail({
     {
       retentionDays: 365, // Keep for 1 year
       archiveAfterDays: 90, // Archive after 90 days
-      severities: [AuditSeverity.HIGH, AuditSeverity.CRITICAL]
+      severities: [AlertSeverity.HIGH, AlertSeverity.CRITICAL]
     },
     {
       retentionDays: 90, // Keep regular events for 90 days

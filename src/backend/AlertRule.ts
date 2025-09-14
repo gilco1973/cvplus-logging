@@ -6,7 +6,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { LogEntry, LogLevel, LogDomain, AlertRule as IAlertRule, AlertSeverity } from './types';
+import { LogEntry, LogLevel, LogDomain, AlertRule as IAlertRule, AlertSeverity } from './types/index';
 
 /**
  * Alert condition types
@@ -205,6 +205,14 @@ interface LogEntryWindow {
  * Alert rule implementation
  */
 export class AlertRule extends EventEmitter implements IAlertRule {
+  // IAlertRule interface properties
+  public readonly id: string;
+  public readonly name: string;
+  public readonly description: string;
+  public readonly condition: any; // We'll map from conditions array
+  public readonly actions: any[];
+  public readonly enabled: boolean;
+  public readonly cooldownMinutes?: number;
   private readonly config: AlertRuleConfig;
   private readonly logWindows: Map<string, LogEntryWindow> = new Map();
   private readonly stats: AlertRuleStats;
@@ -215,6 +223,16 @@ export class AlertRule extends EventEmitter implements IAlertRule {
     super();
 
     this.config = { ...config };
+
+    // Initialize IAlertRule interface properties
+    this.id = config.id;
+    this.name = config.name;
+    this.description = config.description;
+    this.condition = config.conditions[0] || {}; // Use first condition as primary
+    this.actions = config.actions;
+    this.enabled = config.enabled;
+    this.cooldownMinutes = config.cooldownMs ? Math.round(config.cooldownMs / 60000) : undefined;
+
     this.stats = {
       ruleId: config.id,
       totalTriggered: 0,
@@ -284,7 +302,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
       return false;
     }
 
-    if (filters.packages && !filters.packages.includes(entry.package)) {
+    if (filters.packages && entry.package && !filters.packages.includes(entry.package)) {
       return false;
     }
 
@@ -380,7 +398,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
       case 'response_time':
         const responseTimes = window.entries
           .filter(e => e.performance?.duration)
-          .map(e => e.performance!.duration);
+          .map(e => e.performance!.duration!);
         metricValue = responseTimes.length ? Math.max(...responseTimes) : 0;
         break;
       case 'memory_usage':

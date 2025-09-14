@@ -6,6 +6,7 @@
  */
 
 import winston from 'winston';
+import Transport from 'winston-transport';
 import { LogEntry, LogLevel, FirebaseLogEntry, LogDomain } from './types';
 import { LogFormatter } from './LogFormatter';
 
@@ -23,7 +24,8 @@ const FIREBASE_SEVERITY_MAP: Record<LogLevel, string> = {
 /**
  * Firebase Transport configuration options
  */
-export interface FirebaseTransportOptions extends winston.TransportOptions {
+export interface FirebaseTransportOptions {
+  level?: string;
   /**
    * Google Cloud Project ID
    */
@@ -68,7 +70,7 @@ export interface FirebaseTransportOptions extends winston.TransportOptions {
 /**
  * Firebase Cloud Logging transport for Winston
  */
-export class FirebaseTransport extends winston.Transport {
+export class FirebaseTransport extends Transport {
   private readonly options: FirebaseTransportOptions;
   private readonly logBatch: FirebaseLogEntry[] = [];
   private batchTimeout?: NodeJS.Timeout;
@@ -88,7 +90,7 @@ export class FirebaseTransport extends winston.Transport {
     };
 
     // Set transport name for Winston
-    this.name = 'firebase';
+    this.setMaxListeners(30);
 
     // Bind methods to preserve context
     this.log = this.log.bind(this);
@@ -204,8 +206,10 @@ export class FirebaseTransport extends winston.Transport {
     this.logBatch.length = 0; // Clear the batch
 
     // Process batch
-    this.processBatch(batchToProcess).catch(error => {
-      this.emit('error', new Error(`Firebase logging failed: ${error.message}`));
+    this.processBatch(batchToProcess).catch((error: any) => {
+      if (typeof this.emit === 'function') {
+        this.emit('error', new Error(`Firebase logging failed: ${error.message}`));
+      }
 
       // Re-add failed entries to batch for retry
       this.logBatch.unshift(...batchToProcess);
@@ -258,7 +262,9 @@ export class FirebaseTransport extends winston.Transport {
     // Flush any remaining entries
     this.flush();
 
-    super.close();
+    if (super.close) {
+      super.close();
+    }
   }
 
   /**
@@ -307,8 +313,7 @@ export class FirebaseTransport extends winston.Transport {
       level: isDevelopment ? 'debug' : 'info',
       batchSize: isDevelopment ? 10 : 100,
       flushInterval: isDevelopment ? 1000 : 5000,
-      structured: true,
-      silent: process.env.NODE_ENV === 'test'
+      structured: true
     });
   }
 

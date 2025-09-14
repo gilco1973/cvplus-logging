@@ -8,7 +8,7 @@
 import { EventEmitter } from 'events';
 import { createGzip, createGunzip } from 'zlib';
 import { promisify } from 'util';
-import { LogEntry, LogLevel, LogDomain } from './types';
+import { LogEntry, LogLevel, LogDomain } from './types/index';
 
 /**
  * Archive storage types
