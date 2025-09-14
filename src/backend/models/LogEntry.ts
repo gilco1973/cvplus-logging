@@ -318,8 +318,8 @@ export class LogEntry implements ILogEntry {
     if (!this.tags) {
       (this as any).tags = [];
     }
-    if (!this.tags.includes(tag)) {
-      this.tags.push(tag);
+    if (!this.tags!.includes(tag)) {
+      this.tags!.push(tag);
     }
   }
 
@@ -354,14 +354,33 @@ export class LogEntry implements ILogEntry {
    */
   clone(modifications: Partial<ILogEntry> = {}): LogEntry {
     return new LogEntry({
-      ...this.toObject(),
-      timestamp: this.timestamp, // Keep as Date object
-      processedAt: this.processedAt, // Keep as Date object
+      id: this.id,
+      timestamp: this.timestamp,
+      level: this.level,
+      message: this.message,
+      service: this.service,
+      correlationId: this.correlationId,
+      domain: this.domain,
+      component: this.component,
+      traceId: this.traceId,
+      spanId: this.spanId,
+      parentSpanId: this.parentSpanId,
+      userId: this.userId,
+      sessionId: this.sessionId,
+      requestId: this.requestId,
+      source: this.source,
+      metadata: this.metadata,
+      context: this.context,
+      tags: this.tags,
+      performance: this.performance,
+      error: this.error,
+      sensitivityLevel: this.sensitivityLevel,
+      piiRedacted: this.piiRedacted,
+      encryptionLevel: this.encryptionLevel,
       ...modifications
     });
   }
 }
 
 // Export both interface and class
-export { ILogEntry };
 export default LogEntry;

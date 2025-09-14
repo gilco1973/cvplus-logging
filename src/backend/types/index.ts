@@ -42,6 +42,27 @@ export interface LogEntry {
   requestId?: string;
 }
 
+// Log metadata structure
+export interface LogMetadata {
+  [key: string]: any;
+  version?: string;
+  environment?: string;
+  buildId?: string;
+  deploymentId?: string;
+  region?: string;
+  instanceId?: string;
+}
+
+// Log source information
+export interface LogSource {
+  file?: string;
+  function?: string;
+  line?: number;
+  column?: number;
+  module?: string;
+  package?: string;
+}
+
 // Error information structure
 export interface ErrorInfo {
   message: string;
@@ -77,6 +98,8 @@ export interface LoggerConfig {
   format?: 'json' | 'simple' | 'detailed';
   redactPII?: boolean;
   metadata?: Record<string, any>;
+  package?: string;
+  enablePiiRedaction?: boolean;
 }
 
 // Audit severity levels
@@ -336,7 +359,9 @@ export const DEFAULT_LOGGER_CONFIG: Required<LoggerConfig> = {
   maxFiles: 5,
   format: 'json',
   redactPII: true,
-  metadata: {}
+  metadata: {},
+  package: 'unknown',
+  enablePiiRedaction: true
 };
 
 export const DEFAULT_FACTORY_CONFIG: Required<LoggerFactoryConfig> = {

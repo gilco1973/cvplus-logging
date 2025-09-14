@@ -5,7 +5,8 @@
  * Provides consistent structured formatting across all CVPlus packages
  */
 
-import { LogEntry, LogLevel, FormattedLogEntry, FirebaseLogEntry } from './types';
+import { LogLevel, PerformanceInfo, LogDomain } from './types/index';
+import { LogEntry, FormattedLogEntry, FirebaseLogEntry } from './types';
 
 /**
  * Color codes for console output
@@ -94,8 +95,8 @@ export class LogFormatter {
     const timestamp = logEntry.timestamp;
     const level = logEntry.level.toUpperCase();
     const domain = logEntry.domain;
-    const correlationId = logEntry.correlationId.substring(0, 8); // Truncate for readability
-    const packageName = logEntry.package.replace('@cvplus/', '');
+    const correlationId = logEntry.correlationId?.substring(0, 8) || 'unknown'; // Truncate for readability
+    const packageName = logEntry.package?.replace('@cvplus/', '') || 'unknown';
     const message = this.sanitizeMessage(logEntry.message);
 
     // Apply colors
@@ -246,7 +247,7 @@ export class LogFormatter {
   /**
    * Format performance metrics for console display
    */
-  private static formatPerformanceForConsole(performance: Record<string, number>): string {
+  private static formatPerformanceForConsole(performance: PerformanceInfo): string {
     const parts: string[] = [];
 
     if (performance.duration !== undefined) {
@@ -281,7 +282,7 @@ export class LogFormatter {
     return {
       format: (message: string, context: Record<string, unknown> = {}) => ({
         message: this.sanitizeMessage(message),
-        domain,
+        domain: domain as LogDomain,
         context: {
           ...context,
           template: `${domain}-template`

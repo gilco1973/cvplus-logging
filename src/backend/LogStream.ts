@@ -6,7 +6,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { LogEntry, LogLevel, LogDomain, LogStream as ILogStream } from './types';
+import { LogEntry, LogLevel, LogDomain, LogStream as LogStreamInterface } from './types';
 import { PiiRedaction } from './PiiRedaction';
 
 /**
@@ -94,19 +94,36 @@ export interface LogStreamEvents {
 /**
  * Real-time log stream manager
  */
-export class LogStream extends EventEmitter implements ILogStream {
-  private readonly id: string;
-  private readonly name: string;
+export class LogStream extends EventEmitter implements LogStreamInterface {
+  public readonly id: string;
+  public readonly name: string;
+  public readonly package: string;
+  public readonly domain: LogDomain;
+  public readonly level: LogLevel;
+  public enabled: boolean = true;
+  public retention?: number;
+  public tags?: string[];
+  
   private readonly filter: LogStreamFilter;
   private readonly buffer: LogEntry[] = [];
   private readonly stats: LogStreamStats;
   private isActive: boolean = true;
 
-  constructor(id: string, name: string, filter: LogStreamFilter = {}) {
+  constructor(
+    id: string, 
+    name: string, 
+    packageName: string,
+    domain: LogDomain = LogDomain.SYSTEM,
+    level: LogLevel = LogLevel.INFO,
+    filter: LogStreamFilter = {}
+  ) {
     super();
 
     this.id = id;
     this.name = name;
+    this.package = packageName;
+    this.domain = domain;
+    this.level = level;
     this.filter = {
       maxBufferSize: 1000,
       redactPii: true,
@@ -239,12 +256,12 @@ export class LogStream extends EventEmitter implements ILogStream {
     }
 
     // Domain filter
-    if (this.filter.domains && !this.filter.domains.includes(entry.domain)) {
+    if (this.filter.domains && entry.domain && !this.filter.domains.includes(entry.domain as LogDomain)) {
       return false;
     }
 
     // Package filter
-    if (this.filter.packages && !this.filter.packages.includes(entry.package)) {
+    if (this.filter.packages && entry.package && !this.filter.packages.includes(entry.package)) {
       return false;
     }
 
@@ -367,7 +384,7 @@ export class LogStream extends EventEmitter implements ILogStream {
   searchBuffer(searchFilter: Partial<LogStreamFilter>): LogEntry[] {
     return this.buffer.filter(entry => {
       // Create temporary stream with search filter to use existing filter logic
-      const tempStream = new LogStream('temp', 'temp', searchFilter);
+      const tempStream = new LogStream('temp', 'temp', 'temp', LogDomain.SYSTEM, LogLevel.INFO, searchFilter);
       return (tempStream as any).passesFilter(entry);
     });
   }
@@ -400,7 +417,7 @@ export class LogStreamManager extends EventEmitter {
       throw new Error(`Stream with ID '${id}' already exists`);
     }
 
-    const stream = new LogStream(id, name, filter);
+    const stream = new LogStream(id, name, 'default', LogDomain.SYSTEM, LogLevel.INFO, filter);
     this.streams.set(id, stream);
 
     // Forward stream events

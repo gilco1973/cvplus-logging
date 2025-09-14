@@ -238,7 +238,7 @@ export class FirebaseTransport extends Transport {
         });
       }
     } catch (error) {
-      throw new Error(`Failed to write logs to Firebase: ${error.message}`);
+      throw new Error(`Failed to write logs to Firebase: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 

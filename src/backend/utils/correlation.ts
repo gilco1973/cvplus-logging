@@ -81,8 +81,9 @@ export class CorrelationManager {
    * Add user context to current correlation
    */
   addUserContext(userId: string, sessionId?: string): void {
-    const context = this.getCorrelationContext() || {};
+    const context = this.getCorrelationContext();
     this.setCorrelationContext({
+      correlationId: context?.correlationId || this.generateCorrelationId(),
       ...context,
       userId,
       sessionId
@@ -93,8 +94,9 @@ export class CorrelationManager {
    * Add request context to current correlation
    */
   addRequestContext(requestId: string, traceId?: string): void {
-    const context = this.getCorrelationContext() || {};
+    const context = this.getCorrelationContext();
     this.setCorrelationContext({
+      correlationId: context?.correlationId || this.generateCorrelationId(),
       ...context,
       requestId,
       traceId
@@ -106,12 +108,12 @@ export class CorrelationManager {
    */
   createChildCorrelation(parentCorrelationId?: string): string {
     const childCorrelationId = this.generateCorrelationId();
-    const existingContext = this.getCorrelationContext() || {};
+    const existingContext = this.getCorrelationContext();
 
     this.setCorrelationContext({
       ...existingContext,
       correlationId: childCorrelationId,
-      parentId: parentCorrelationId || existingContext.correlationId
+      parentId: parentCorrelationId || existingContext?.correlationId
     });
 
     return childCorrelationId;

@@ -4,7 +4,8 @@
  */
 
 import { EventEmitter } from 'events';
-import { LogLevel, LogEntry, LogMetadata, CorrelationContext } from '../types/logging.types';
+import { LogLevel, LogMetadata, CorrelationContext } from '../backend/types/index';
+import { LogEntry } from '../backend/models/LogEntry';
 
 /**
  * Mock log entry generator for testing
@@ -25,7 +26,7 @@ export class MockLogGenerator {
   generateLogEntry(overrides: Partial<LogEntry> = {}): LogEntry {
     this.sequenceNumber++;
 
-    const defaultEntry: LogEntry = {
+    const entryData = {
       id: `mock-${this.sequenceNumber}-${Date.now()}`,
       timestamp: new Date(this.baseTimestamp.getTime() + this.sequenceNumber * 1000),
       level: this.randomLogLevel(),
@@ -44,10 +45,11 @@ export class MockLogGenerator {
       performance: {
         duration: Math.floor(Math.random() * 1000),
         memoryUsage: Math.floor(Math.random() * 100) * 1024 * 1024
-      }
+      },
+      ...overrides
     };
 
-    return { ...defaultEntry, ...overrides };
+    return new LogEntry(entryData);
   }
 
   /**
@@ -74,7 +76,7 @@ export class MockLogGenerator {
 
       for (let i = 0; i < count; i++) {
         logs.push(this.generateLogEntry({
-          level: 'error',
+          level: LogLevel.ERROR,
           timestamp: new Date(this.baseTimestamp.getTime() + i * interval),
           message: `Error burst event ${i + 1}`,
           metadata: { errorType: 'BurstPattern', sequenceNumber: i + 1 }
@@ -118,7 +120,7 @@ export class MockLogGenerator {
       for (let i = 0; i < count; i++) {
         const responseTime = baseResponseTime + (i * degradationFactor);
         logs.push(this.generateLogEntry({
-          level: responseTime > 2000 ? 'warn' : 'info',
+          level: responseTime > 2000 ? LogLevel.WARN : LogLevel.INFO,
           message: `Request completed in ${responseTime}ms`,
           metadata: { responseTime, degradationIndex: i },
           performance: { duration: responseTime }
@@ -130,7 +132,7 @@ export class MockLogGenerator {
   }
 
   private randomLogLevel(): LogLevel {
-    const levels: LogLevel[] = ['trace', 'debug', 'info', 'warn', 'error'];
+    const levels: LogLevel[] = [LogLevel.DEBUG, LogLevel.INFO, LogLevel.WARN, LogLevel.ERROR, LogLevel.FATAL];
     const weights = [0.1, 0.2, 0.5, 0.15, 0.05]; // Realistic distribution
     const random = Math.random();
     let cumulativeWeight = 0;
@@ -142,7 +144,7 @@ export class MockLogGenerator {
       }
     }
 
-    return 'info';
+    return LogLevel.INFO;
   }
 
   private randomService(): string {
@@ -187,7 +189,7 @@ export class MockLogGenerator {
   private generateContext(): CorrelationContext {
     return {
       correlationId: this.generateCorrelationId(),
-      parentSpanId: `span-${Math.random().toString(36).substr(2, 8)}`,
+      parentId: `span-${Math.random().toString(36).substr(2, 8)}`,
       traceId: `trace-${Math.random().toString(36).substr(2, 12)}`,
       userId: this.generateUserId(),
       sessionId: `session-${Math.random().toString(36).substr(2, 10)}`
@@ -242,13 +244,13 @@ export class MockLogger extends EventEmitter {
     this.config = {
       enableConsole: true,
       enableStorage: true,
-      minimumLevel: 'trace',
+      minimumLevel: LogLevel.DEBUG,
       ...config
     };
   }
 
   log(level: LogLevel, message: string, metadata?: LogMetadata, context?: CorrelationContext): void {
-    const entry: LogEntry = {
+    const entryData = {
       id: `mock-${Date.now()}-${Math.random().toString(36).substr(2, 8)}`,
       timestamp: new Date(),
       level,
@@ -266,6 +268,7 @@ export class MockLogger extends EventEmitter {
       }
     };
 
+    const entry = new LogEntry(entryData);
     this.logs.push(entry);
     this.emit('log', entry);
 
@@ -275,23 +278,23 @@ export class MockLogger extends EventEmitter {
   }
 
   info(message: string, metadata?: LogMetadata, context?: CorrelationContext): void {
-    this.log('info', message, metadata, context);
+    this.log(LogLevel.INFO, message, metadata, context);
   }
 
   warn(message: string, metadata?: LogMetadata, context?: CorrelationContext): void {
-    this.log('warn', message, metadata, context);
+    this.log(LogLevel.WARN, message, metadata, context);
   }
 
   error(message: string, metadata?: LogMetadata, context?: CorrelationContext): void {
-    this.log('error', message, metadata, context);
+    this.log(LogLevel.ERROR, message, metadata, context);
   }
 
   debug(message: string, metadata?: LogMetadata, context?: CorrelationContext): void {
-    this.log('debug', message, metadata, context);
+    this.log(LogLevel.DEBUG, message, metadata, context);
   }
 
   trace(message: string, metadata?: LogMetadata, context?: CorrelationContext): void {
-    this.log('trace', message, metadata, context);
+    this.log(LogLevel.DEBUG, message, metadata, context);
   }
 
   // Test utilities

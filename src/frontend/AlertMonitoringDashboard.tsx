@@ -27,7 +27,7 @@ import {
   MoreHorizontal,
   Zap
 } from 'lucide-react';
-import { logger } from '../../utils/logger';
+import { logger } from '../backend/index';
 
 // Alert types and interfaces
 export enum AlertStatus {
@@ -200,7 +200,7 @@ export const AlertMonitoringDashboard: React.FC<{
    * Initialize dashboard
    */
   useEffect(() => {
-    logger.logEvent('alert_dashboard.initialized', {
+    logger.info('alert_dashboard.initialized', {
       config,
       defaultTimeRange: config.defaultTimeRange
     });
@@ -253,7 +253,7 @@ export const AlertMonitoringDashboard: React.FC<{
       setTotalCount(pagination.total || 0);
       setCurrentPage(page);
 
-      logger.logEvent('alert_dashboard.alerts_loaded', {
+      logger.info('alert_dashboard.alerts_loaded', {
         count: alertData.length,
         total: pagination.total,
         page
@@ -263,7 +263,7 @@ export const AlertMonitoringDashboard: React.FC<{
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       setError(errorMessage);
 
-      logger.logError('alert_dashboard.load_alerts_failed', error, {
+      logger.error('alert_dashboard.load_alerts_failed', {
         page
       });
     } finally {
@@ -289,7 +289,7 @@ export const AlertMonitoringDashboard: React.FC<{
       }
 
     } catch (error) {
-      logger.logError('alert_dashboard.load_stats_failed', error);
+      logger.error('alert_dashboard.load_stats_failed', {}, error instanceof Error ? error : undefined);
     }
   }, [filters.timeRange.preset]);
 
@@ -356,7 +356,7 @@ export const AlertMonitoringDashboard: React.FC<{
     const ws = new WebSocket(`${protocol}//${window.location.host}/api/v1/alerts/stream`);
 
     ws.onopen = () => {
-      logger.logEvent('alert_dashboard.websocket_connected');
+      logger.info('alert_dashboard.websocket_connected');
     };
 
     ws.onmessage = (event) => {
@@ -364,12 +364,12 @@ export const AlertMonitoringDashboard: React.FC<{
         const message = JSON.parse(event.data);
         handleWebSocketMessage(message);
       } catch (error) {
-        logger.logError('alert_dashboard.websocket_message_error', error);
+        logger.error('alert_dashboard.websocket_message_error', {}, error instanceof Error ? error : undefined);
       }
     };
 
     ws.onclose = () => {
-      logger.logEvent('alert_dashboard.websocket_disconnected');
+      logger.info('alert_dashboard.websocket_disconnected');
       // Attempt to reconnect after 5 seconds
       setTimeout(() => {
         if (config.realTimeUpdates) {
@@ -379,7 +379,7 @@ export const AlertMonitoringDashboard: React.FC<{
     };
 
     ws.onerror = (error) => {
-      logger.logError('alert_dashboard.websocket_error', error);
+      logger.error('alert_dashboard.websocket_error', {}, error instanceof Error ? error : undefined);
     };
 
     wsRef.current = ws;
@@ -465,7 +465,7 @@ export const AlertMonitoringDashboard: React.FC<{
         throw new Error(`Failed to acknowledge alert: ${response.statusText}`);
       }
 
-      logger.logEvent('alert_dashboard.alert_acknowledged', {
+      logger.info('alert_dashboard.alert_acknowledged', {
         alertId,
         hasNote: !!note
       });
@@ -474,8 +474,8 @@ export const AlertMonitoringDashboard: React.FC<{
       loadAlerts(currentPage);
 
     } catch (error) {
-      logger.logError('alert_dashboard.acknowledge_failed', error, { alertId });
-      setError(`Failed to acknowledge alert: ${error.message}`);
+      logger.error('alert_dashboard.acknowledge_failed', { alertId }, error instanceof Error ? error : undefined);
+      setError(`Failed to acknowledge alert: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }, [currentPage, loadAlerts]);
 
@@ -493,7 +493,7 @@ export const AlertMonitoringDashboard: React.FC<{
         throw new Error(`Failed to resolve alert: ${response.statusText}`);
       }
 
-      logger.logEvent('alert_dashboard.alert_resolved', {
+      logger.info('alert_dashboard.alert_resolved', {
         alertId,
         hasNote: !!note,
         resolution
@@ -503,8 +503,8 @@ export const AlertMonitoringDashboard: React.FC<{
       loadAlerts(currentPage);
 
     } catch (error) {
-      logger.logError('alert_dashboard.resolve_failed', error, { alertId });
-      setError(`Failed to resolve alert: ${error.message}`);
+      logger.error('alert_dashboard.resolve_failed', { alertId }, error instanceof Error ? error : undefined);
+      setError(`Failed to resolve alert: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }, [currentPage, loadAlerts]);
 
@@ -530,7 +530,7 @@ export const AlertMonitoringDashboard: React.FC<{
 
       const result = await response.json();
 
-      logger.logEvent('alert_dashboard.bulk_action_performed', {
+      logger.info('alert_dashboard.bulk_action_performed', {
         action,
         alertCount: selectedAlertIds.size,
         successful: result.data?.successful?.length || 0,
@@ -547,11 +547,11 @@ export const AlertMonitoringDashboard: React.FC<{
       }
 
     } catch (error) {
-      logger.logError('alert_dashboard.bulk_action_failed', error, {
+      logger.error('alert_dashboard.bulk_action_failed', {
         action,
         alertCount: selectedAlertIds.size
-      });
-      setError(`Bulk action failed: ${error.message}`);
+      }, error instanceof Error ? error : undefined);
+      setError(`Bulk action failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }, [selectedAlertIds, currentPage, loadAlerts, onBulkAction]);
 

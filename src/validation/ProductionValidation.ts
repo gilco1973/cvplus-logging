@@ -4,7 +4,8 @@
  */
 
 import { EventEmitter } from 'events';
-import { LogLevel, LogEntry, LoggerConfig } from '../types/logging.types';
+import { LogLevel, LoggerConfig } from '../backend/types/index';
+import { LogEntry } from '../backend/models/LogEntry';
 
 // Validation result types
 export interface ValidationResult {
@@ -79,7 +80,7 @@ export class ProductionValidator extends EventEmitter {
     const results: ValidationResult[] = [];
 
     // Check log levels
-    if (config.level === 'trace' || config.level === 'debug') {
+    if (config.level === LogLevel.DEBUG) {
       results.push({
         isValid: false,
         category: 'configuration',
@@ -95,7 +96,9 @@ export class ProductionValidator extends EventEmitter {
     }
 
     // Check output destinations
-    if (!config.outputs || config.outputs.length === 0) {
+    // Check if outputs exist (optional property)
+    const outputs = (config as any).outputs;
+    if (!outputs || outputs.length === 0) {
       results.push({
         isValid: false,
         category: 'configuration',
@@ -110,13 +113,15 @@ export class ProductionValidator extends EventEmitter {
     }
 
     // Check buffer settings
-    if (config.bufferSize && config.bufferSize > 10000) {
+    // Check buffer size (optional property)
+    const bufferSize = (config as any).bufferSize;
+    if (bufferSize && bufferSize > 10000) {
       results.push({
         isValid: false,
         category: 'configuration',
         severity: 'warning',
         message: 'Large buffer size may cause memory issues',
-        details: { bufferSize: config.bufferSize },
+        details: { bufferSize },
         recommendations: [
           'Consider reducing buffer size to prevent memory spikes',
           'Implement buffer overflow handling'
@@ -126,7 +131,9 @@ export class ProductionValidator extends EventEmitter {
     }
 
     // Check sampling configuration
-    if (!config.sampling || config.sampling.rate === 1.0) {
+    // Check sampling configuration (optional property)
+    const sampling = (config as any).sampling;
+    if (!sampling || sampling.rate === 1.0) {
       results.push({
         isValid: true,
         category: 'configuration',

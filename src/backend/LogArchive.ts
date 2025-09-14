@@ -381,7 +381,7 @@ export class LogArchive extends EventEmitter {
         return false;
       }
 
-      if (policy.packages && !policy.packages.includes(entry.package)) {
+      if (policy.packages && entry.package && !policy.packages.includes(entry.package)) {
         return false;
       }
 
@@ -449,7 +449,7 @@ export class LogArchive extends EventEmitter {
     // Extract metadata
     const levels = [...new Set(processedEntries.map(e => e.level))];
     const domains = [...new Set(processedEntries.map(e => e.domain))];
-    const packages = [...new Set(processedEntries.map(e => e.package))];
+    const packages = [...new Set(processedEntries.map(e => e.package).filter(Boolean))] as string[];
 
     const metadata: ArchiveMetadata = {
       id: archiveId,
@@ -507,7 +507,6 @@ export class LogArchive extends EventEmitter {
         };
 
       case CompressionType.GZIP: {
-        const gzip = promisify(createGzip());
         const compressedData = await new Promise<Buffer>((resolve, reject) => {
           const chunks: Buffer[] = [];
           const gzipStream = createGzip();
@@ -688,7 +687,7 @@ export class LogArchive extends EventEmitter {
     }
 
     if (query.packages) {
-      filtered = filtered.filter(entry => query.packages!.includes(entry.package));
+      filtered = filtered.filter(entry => entry.package && query.packages!.includes(entry.package));
     }
 
     if (query.userIds) {

@@ -9,9 +9,9 @@ import {
   LoggerFactory,
   CorrelationService,
   LogLevel,
-  LogDomain,
-  type Logger
+  LogDomain
 } from './index';
+import { BaseLogger } from './core/BaseLogger';
 
 /**
  * Generic package logger interface
@@ -29,7 +29,7 @@ export interface PackageLogger {
  * Base package logger implementation
  */
 export abstract class BasePackageLogger implements PackageLogger {
-  protected readonly logger: Logger;
+  protected readonly logger: BaseLogger;
   protected readonly packageName: string;
 
   constructor(packageName: string, logLevel: LogLevel = LogLevel.INFO) {
@@ -43,17 +43,17 @@ export abstract class BasePackageLogger implements PackageLogger {
   }
 
   info(message: string, context?: Record<string, any>): void {
-    const correlationId = CorrelationService.getCurrentCorrelationId();
+    const correlationId = CorrelationService.getCurrentId();
     this.logger.info(message, { ...context, correlationId, package: this.packageName });
   }
 
   warn(message: string, context?: Record<string, any>): void {
-    const correlationId = CorrelationService.getCurrentCorrelationId();
+    const correlationId = CorrelationService.getCurrentId();
     this.logger.warn(message, { ...context, correlationId, package: this.packageName });
   }
 
   error(message: string, error?: Error, context?: Record<string, any>): void {
-    const correlationId = CorrelationService.getCurrentCorrelationId();
+    const correlationId = CorrelationService.getCurrentId();
     this.logger.error(message, {
       ...context,
       correlationId,
@@ -67,12 +67,13 @@ export abstract class BasePackageLogger implements PackageLogger {
   }
 
   debug(message: string, context?: Record<string, any>): void {
-    const correlationId = CorrelationService.getCurrentCorrelationId();
+    const correlationId = CorrelationService.getCurrentId();
     this.logger.debug(message, { ...context, correlationId, package: this.packageName });
   }
 
   withCorrelation<T>(correlationId: string, callback: () => T): T {
-    return CorrelationService.withCorrelationId(correlationId, callback);
+    const result = CorrelationService.withCorrelationId(correlationId, callback);
+    return result as T;
   }
 
   abstract getStats(): Record<string, any>;
@@ -448,4 +449,5 @@ export const packageLogging = {
   payments: paymentsLogger
 };
 
-export default PackageLoggerFactory;
+// Export the factory function as default
+export default createPackageLogger;

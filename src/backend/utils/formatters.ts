@@ -81,7 +81,7 @@ export class CVPlusLogFormatter implements LogFormatter {
   /**
    * Format error information with proper structure
    */
-  formatError(error: ErrorInfo): ErrorInfo {
+  formatError(error: ErrorInfo): string {
     const formatted: ErrorInfo = {
       message: error.message,
       name: error.name || 'Error',
@@ -103,13 +103,13 @@ export class CVPlusLogFormatter implements LogFormatter {
       formatted.details = this.enablePIIRedaction ? this.redactPII(error.details) : error.details;
     }
 
-    return formatted;
+    return JSON.stringify(formatted);
   }
 
   /**
    * Format performance information
    */
-  formatPerformance(perf: PerformanceInfo): PerformanceInfo {
+  formatPerformance(perf: PerformanceInfo): string {
     const formatted: PerformanceInfo = {};
 
     if (perf.duration !== undefined) {
@@ -135,7 +135,7 @@ export class CVPlusLogFormatter implements LogFormatter {
       }, {} as Record<string, number>);
     }
 
-    return formatted;
+    return JSON.stringify(formatted);
   }
 
   /**
@@ -302,6 +302,7 @@ export class CVPlusLogFormatter implements LogFormatter {
       warn: '\x1b[33m',  // Yellow
       info: '\x1b[32m',  // Green
       debug: '\x1b[36m', // Cyan
+      fatal: '\x1b[35m', // Magenta
       reset: '\x1b[0m'
     };
 

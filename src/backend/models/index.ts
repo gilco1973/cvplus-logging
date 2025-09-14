@@ -2,7 +2,10 @@
  * Models index - Export all logging data models
  */
 
-export { LogEntry, ILogEntry } from './LogEntry';
+import { LogEntry } from './LogEntry';
+
+export { LogEntry };
+export type { ILogEntry } from './LogEntry';
 
 // Re-export for convenience
 export default {

@@ -5,7 +5,8 @@
  * batch processing, memory management, connection pooling, and intelligent caching.
  */
 
-import { LogEntry, LogLevel, LogDomain } from '../types';
+import { LogLevel, LogDomain } from '../types';
+import { LogEntry } from '../models/LogEntry';
 import { BaseLogger } from '../core/BaseLogger';
 import { EventEmitter } from 'events';
 
@@ -213,10 +214,15 @@ export class PerformanceOptimizer extends EventEmitter {
 
     } catch (error) {
       this.metrics.errors++;
-      this.logger.error('Batch processing failed', error as Error, {
+      this.logger.error('Batch processing failed', {
         batchId,
         batchSize: logs.length,
-        event: 'BATCH_PROCESS_ERROR'
+        event: 'BATCH_PROCESS_ERROR',
+        error: error instanceof Error ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        } : error
       });
 
       this.cleanupBatch(batchId);
@@ -244,7 +250,8 @@ export class PerformanceOptimizer extends EventEmitter {
     const grouped = new Map<string, LogEntry[]>();
 
     logs.forEach(log => {
-      const key = `${log.level}-${log.service || log.source || 'default'}`;
+      const sourceStr = typeof log.source === 'object' ? log.source?.package || log.source?.module || 'unknown' : 'default';
+      const key = `${log.level}-${log.service || sourceStr}`;
       if (!grouped.has(key)) {
         grouped.set(key, []);
       }
@@ -311,7 +318,7 @@ export class PerformanceOptimizer extends EventEmitter {
       await this.simulateProcessing(log);
 
       const result = {
-        id: log.id || `log_${Date.now()}`,
+        id: log.id,
         processed: true,
         timestamp: new Date().toISOString()
       };
@@ -391,7 +398,8 @@ export class PerformanceOptimizer extends EventEmitter {
   }
 
   private getCacheKey(log: LogEntry): string {
-    return `${log.level}-${log.message.substring(0, 50)}-${log.service || log.source || ''}`;
+    const sourceStr = typeof log.source === 'object' ? log.source?.package || log.source?.module || 'unknown' : 'default';
+    return `${log.level}-${log.message.substring(0, 50)}-${log.service || sourceStr}`;
   }
 
   /**
