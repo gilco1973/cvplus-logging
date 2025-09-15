@@ -1,0 +1,1 @@
+{"version":3,"file":"LogsApiService.d.ts","sourceRoot":"","sources":["../../../src/frontend/components/LogsApiService.tsx"],"names":[],"mappings":"AAAA;;;GAGG;AAGH,OAAO,EAAE,SAAS,EAAE,eAAe,EAAE,MAAM,SAAS,CAAC;AAIrD,eAAO,MAAM,iBAAiB,GAAI,QAAQ,eAAe;wBAyDV,SAAS,SAAQ,MAAM,WAAc,OAAO;;;;;iCArDzC,SAAS,QAAQ,MAAM,KAAG,MAAM;CAoGjF,CAAC"}
