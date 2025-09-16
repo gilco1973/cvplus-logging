@@ -11,7 +11,8 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "target": "ES2018",
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "noEmit": false
   },
   "include": [
     "src/**/*"

@@ -4,6 +4,23 @@
   "description": "CVPlus comprehensive logging system with Firebase integration, PII redaction, and performance monitoring",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./backend": {
+      "import": "./dist/backend/index.js",
+      "require": "./dist/backend/index.js",
+      "types": "./dist/backend/index.d.ts"
+    },
+    "./frontend": {
+      "import": "./dist/frontend/index.js",
+      "require": "./dist/frontend/index.js",
+      "types": "./dist/frontend/index.d.ts"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
