@@ -3,7 +3,7 @@
  *
  * Manages log streams for real-time log processing and filtering
  * Provides event-driven log streaming capabilities for dashboards and monitoring
- */
+  */
 
 import { EventEmitter } from 'events';
 import { LogEntry, LogLevel, LogDomain, LogStream as LogStreamInterface } from './types';
@@ -11,41 +11,41 @@ import { PiiRedaction } from './PiiRedaction';
 
 /**
  * Log stream filter criteria
- */
+  */
 export interface LogStreamFilter {
   /**
    * Filter by log levels
-   */
+    */
   levels?: LogLevel[];
 
   /**
    * Filter by log domains
-   */
+    */
   domains?: LogDomain[];
 
   /**
    * Filter by packages
-   */
+    */
   packages?: string[];
 
   /**
    * Filter by user ID
-   */
+    */
   userId?: string;
 
   /**
    * Filter by session ID
-   */
+    */
   sessionId?: string;
 
   /**
    * Filter by correlation ID pattern
-   */
+    */
   correlationIdPattern?: RegExp;
 
   /**
    * Filter by time range
-   */
+    */
   timeRange?: {
     start: Date;
     end: Date;
@@ -53,23 +53,23 @@ export interface LogStreamFilter {
 
   /**
    * Filter by message content
-   */
+    */
   messagePattern?: RegExp;
 
   /**
    * Maximum entries to keep in buffer
-   */
+    */
   maxBufferSize?: number;
 
   /**
    * Enable PII redaction
-   */
+    */
   redactPii?: boolean;
 }
 
 /**
  * Log stream statistics
- */
+  */
 export interface LogStreamStats {
   totalReceived: number;
   totalFiltered: number;
@@ -82,7 +82,7 @@ export interface LogStreamStats {
 
 /**
  * Log stream events
- */
+  */
 export interface LogStreamEvents {
   'log': (entry: LogEntry) => void;
   'batch': (entries: LogEntry[]) => void;
@@ -93,7 +93,7 @@ export interface LogStreamEvents {
 
 /**
  * Real-time log stream manager
- */
+  */
 export class LogStream extends EventEmitter implements LogStreamInterface {
   public readonly id: string;
   public readonly name: string;
@@ -152,35 +152,35 @@ export class LogStream extends EventEmitter implements LogStreamInterface {
 
   /**
    * Get stream ID
-   */
+    */
   getId(): string {
     return this.id;
   }
 
   /**
    * Get stream name
-   */
+    */
   getName(): string {
     return this.name;
   }
 
   /**
    * Get stream filter
-   */
+    */
   getFilter(): LogStreamFilter {
     return { ...this.filter };
   }
 
   /**
    * Check if stream is active
-   */
+    */
   isStreamActive(): boolean {
     return this.isActive;
   }
 
   /**
    * Process new log entry
-   */
+    */
   processLogEntry(entry: LogEntry): void {
     if (!this.isActive) {
       return;
@@ -214,7 +214,7 @@ export class LogStream extends EventEmitter implements LogStreamInterface {
 
   /**
    * Process batch of log entries
-   */
+    */
   processBatch(entries: LogEntry[]): void {
     if (!this.isActive || entries.length === 0) {
       return;
@@ -248,7 +248,7 @@ export class LogStream extends EventEmitter implements LogStreamInterface {
 
   /**
    * Check if log entry passes the filter criteria
-   */
+    */
   private passesFilter(entry: LogEntry): boolean {
     // Level filter
     if (this.filter.levels && !this.filter.levels.includes(entry.level)) {
@@ -298,7 +298,7 @@ export class LogStream extends EventEmitter implements LogStreamInterface {
 
   /**
    * Add entry to buffer with size management
-   */
+    */
   private addToBuffer(entry: LogEntry): void {
     const maxSize = this.filter.maxBufferSize || 1000;
 
@@ -314,14 +314,14 @@ export class LogStream extends EventEmitter implements LogStreamInterface {
 
   /**
    * Get buffered log entries
-   */
+    */
   getBuffer(): LogEntry[] {
     return [...this.buffer];
   }
 
   /**
    * Get stream statistics
-   */
+    */
   getStats(): LogStreamStats {
     return {
       ...this.stats,
@@ -332,7 +332,7 @@ export class LogStream extends EventEmitter implements LogStreamInterface {
 
   /**
    * Clear the buffer
-   */
+    */
   clearBuffer(): number {
     const clearedCount = this.buffer.length;
     this.buffer.length = 0;
@@ -342,28 +342,28 @@ export class LogStream extends EventEmitter implements LogStreamInterface {
 
   /**
    * Update filter criteria
-   */
+    */
   updateFilter(newFilter: Partial<LogStreamFilter>): void {
     Object.assign(this.filter, newFilter);
   }
 
   /**
    * Pause the stream
-   */
+    */
   pause(): void {
     this.isActive = false;
   }
 
   /**
    * Resume the stream
-   */
+    */
   resume(): void {
     this.isActive = true;
   }
 
   /**
    * Close the stream and cleanup
-   */
+    */
   close(): void {
     this.isActive = false;
     this.buffer.length = 0;
@@ -372,7 +372,7 @@ export class LogStream extends EventEmitter implements LogStreamInterface {
 
   /**
    * Get recent entries from buffer
-   */
+    */
   getRecentEntries(count: number = 100): LogEntry[] {
     const startIndex = Math.max(0, this.buffer.length - count);
     return this.buffer.slice(startIndex);
@@ -380,7 +380,7 @@ export class LogStream extends EventEmitter implements LogStreamInterface {
 
   /**
    * Search buffer for entries matching criteria
-   */
+    */
   searchBuffer(searchFilter: Partial<LogStreamFilter>): LogEntry[] {
     return this.buffer.filter(entry => {
       // Create temporary stream with search filter to use existing filter logic
@@ -391,7 +391,7 @@ export class LogStream extends EventEmitter implements LogStreamInterface {
 
   /**
    * Export buffer as JSON
-   */
+    */
   exportBuffer(): string {
     return JSON.stringify({
       streamId: this.id,
@@ -405,13 +405,13 @@ export class LogStream extends EventEmitter implements LogStreamInterface {
 
 /**
  * Log stream manager for handling multiple streams
- */
+  */
 export class LogStreamManager extends EventEmitter {
   private readonly streams: Map<string, LogStream> = new Map();
 
   /**
    * Create a new log stream
-   */
+    */
   createStream(id: string, name: string, filter: LogStreamFilter = {}): LogStream {
     if (this.streams.has(id)) {
       throw new Error(`Stream with ID '${id}' already exists`);
@@ -432,14 +432,14 @@ export class LogStreamManager extends EventEmitter {
 
   /**
    * Get stream by ID
-   */
+    */
   getStream(id: string): LogStream | undefined {
     return this.streams.get(id);
   }
 
   /**
    * Remove stream
-   */
+    */
   removeStream(id: string): boolean {
     const stream = this.streams.get(id);
     if (stream) {
@@ -453,14 +453,14 @@ export class LogStreamManager extends EventEmitter {
 
   /**
    * Get all stream IDs
-   */
+    */
   getStreamIds(): string[] {
     return Array.from(this.streams.keys());
   }
 
   /**
    * Process log entry to all active streams
-   */
+    */
   processLogEntry(entry: LogEntry): void {
     this.streams.forEach(stream => {
       stream.processLogEntry(entry);
@@ -469,7 +469,7 @@ export class LogStreamManager extends EventEmitter {
 
   /**
    * Process batch to all active streams
-   */
+    */
   processBatch(entries: LogEntry[]): void {
     this.streams.forEach(stream => {
       stream.processBatch(entries);
@@ -478,7 +478,7 @@ export class LogStreamManager extends EventEmitter {
 
   /**
    * Get manager statistics
-   */
+    */
   getStats(): {
     totalStreams: number;
     activeStreams: number;
@@ -498,7 +498,7 @@ export class LogStreamManager extends EventEmitter {
 
   /**
    * Close all streams and cleanup
-   */
+    */
   close(): void {
     this.streams.forEach(stream => stream.close());
     this.streams.clear();
@@ -508,5 +508,5 @@ export class LogStreamManager extends EventEmitter {
 
 /**
  * Global log stream manager instance
- */
+  */
 export const globalStreamManager = new LogStreamManager();

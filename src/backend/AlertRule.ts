@@ -3,14 +3,14 @@
  *
  * Implements intelligent alerting system for log events
  * Provides threshold-based, pattern-based, and ML-based alerting capabilities
- */
+  */
 
 import { EventEmitter } from 'events';
 import { LogEntry, LogLevel, LogDomain, AlertRule as IAlertRule, AlertSeverity } from './types/index';
 
 /**
  * Alert condition types
- */
+  */
 export enum AlertConditionType {
   THRESHOLD = 'threshold',
   PATTERN = 'pattern',
@@ -21,114 +21,114 @@ export enum AlertConditionType {
 
 /**
  * Threshold condition configuration
- */
+  */
 export interface ThresholdCondition {
   type: AlertConditionType.THRESHOLD;
   /**
    * Metric to monitor
-   */
+    */
   metric: 'error_count' | 'warning_count' | 'response_time' | 'memory_usage' | 'cpu_usage';
   /**
    * Threshold value
-   */
+    */
   threshold: number;
   /**
    * Time window in milliseconds
-   */
+    */
   windowMs: number;
   /**
    * Comparison operator
-   */
+    */
   operator: '>' | '>=' | '<' | '<=' | '==';
 }
 
 /**
  * Pattern condition configuration
- */
+  */
 export interface PatternCondition {
   type: AlertConditionType.PATTERN;
   /**
    * Regular expression pattern to match
-   */
+    */
   pattern: RegExp;
   /**
    * Fields to search in
-   */
+    */
   fields: ('message' | 'error.message' | 'context')[];
   /**
    * Minimum occurrences to trigger alert
-   */
+    */
   minOccurrences: number;
   /**
    * Time window in milliseconds
-   */
+    */
   windowMs: number;
 }
 
 /**
  * Frequency condition configuration
- */
+  */
 export interface FrequencyCondition {
   type: AlertConditionType.FREQUENCY;
   /**
    * Log levels to monitor
-   */
+    */
   levels: LogLevel[];
   /**
    * Maximum allowed frequency (events per window)
-   */
+    */
   maxFrequency: number;
   /**
    * Time window in milliseconds
-   */
+    */
   windowMs: number;
 }
 
 /**
  * Anomaly detection condition
- */
+  */
 export interface AnomalyCondition {
   type: AlertConditionType.ANOMALY;
   /**
    * Metric to analyze for anomalies
-   */
+    */
   metric: string;
   /**
    * Sensitivity threshold (1-10, higher = more sensitive)
-   */
+    */
   sensitivity: number;
   /**
    * Historical data points to consider
-   */
+    */
   historicalWindow: number;
 }
 
 /**
  * Chain condition for related events
- */
+  */
 export interface ChainCondition {
   type: AlertConditionType.CHAIN;
   /**
    * Sequence of events that must occur
-   */
+    */
   eventChain: Array<{
     pattern: RegExp;
     maxTimeFromPrevious?: number;
   }>;
   /**
    * Maximum time for entire chain to complete
-   */
+    */
   maxChainTimeMs: number;
 }
 
 /**
  * Union type for all condition types
- */
+  */
 export type AlertCondition = ThresholdCondition | PatternCondition | FrequencyCondition | AnomalyCondition | ChainCondition;
 
 /**
  * Alert rule configuration
- */
+  */
 export interface AlertRuleConfig {
   id: string;
   name: string;
@@ -149,7 +149,7 @@ export interface AlertRuleConfig {
 
 /**
  * Alert actions
- */
+  */
 export enum AlertActionType {
   EMAIL = 'email',
   WEBHOOK = 'webhook',
@@ -160,7 +160,7 @@ export enum AlertActionType {
 
 /**
  * Alert action configuration
- */
+  */
 export interface AlertAction {
   type: AlertActionType;
   config: Record<string, any>;
@@ -169,7 +169,7 @@ export interface AlertAction {
 
 /**
  * Triggered alert information
- */
+  */
 export interface TriggeredAlert {
   ruleId: string;
   ruleName: string;
@@ -182,7 +182,7 @@ export interface TriggeredAlert {
 
 /**
  * Alert rule statistics
- */
+  */
 export interface AlertRuleStats {
   ruleId: string;
   totalTriggered: number;
@@ -194,7 +194,7 @@ export interface AlertRuleStats {
 
 /**
  * Log entry window for time-based analysis
- */
+  */
 interface LogEntryWindow {
   entries: LogEntry[];
   startTime: Date;
@@ -203,7 +203,7 @@ interface LogEntryWindow {
 
 /**
  * Alert rule implementation
- */
+  */
 export class AlertRule extends EventEmitter implements IAlertRule {
   // IAlertRule interface properties
   public readonly id: string;
@@ -249,28 +249,28 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Get rule ID
-   */
+    */
   getId(): string {
     return this.config.id;
   }
 
   /**
    * Get rule configuration
-   */
+    */
   getConfig(): AlertRuleConfig {
     return { ...this.config };
   }
 
   /**
    * Check if rule is enabled
-   */
+    */
   isEnabled(): boolean {
     return this.config.enabled;
   }
 
   /**
    * Process log entry against this rule
-   */
+    */
   processLogEntry(entry: LogEntry): void {
     if (!this.isEnabled() || !this.passesFilters(entry)) {
       return;
@@ -289,7 +289,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Check if log entry passes rule filters
-   */
+    */
   private passesFilters(entry: LogEntry): boolean {
     const filters = this.config.filters;
     if (!filters) return true;
@@ -315,7 +315,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Add log entry to time windows for analysis
-   */
+    */
   private addToWindows(entry: LogEntry): void {
     const entryTime = new Date(entry.timestamp);
 
@@ -344,7 +344,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Check all conditions against current state
-   */
+    */
   private checkConditions(entry: LogEntry): string[] {
     const triggeredConditions: string[] = [];
 
@@ -360,7 +360,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Check individual condition
-   */
+    */
   private checkCondition(condition: AlertCondition, entry: LogEntry): boolean {
     switch (condition.type) {
       case AlertConditionType.THRESHOLD:
@@ -380,7 +380,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Check threshold condition
-   */
+    */
   private checkThresholdCondition(condition: ThresholdCondition, entry: LogEntry): boolean {
     const windowKey = `${condition.type}_${condition.windowMs}`;
     const window = this.logWindows.get(windowKey);
@@ -422,7 +422,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Check pattern condition
-   */
+    */
   private checkPatternCondition(condition: PatternCondition, entry: LogEntry): boolean {
     const windowKey = `${condition.type}_${condition.windowMs}`;
     const window = this.logWindows.get(windowKey);
@@ -444,7 +444,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Check frequency condition
-   */
+    */
   private checkFrequencyCondition(condition: FrequencyCondition, entry: LogEntry): boolean {
     const windowKey = `${condition.type}_${condition.windowMs}`;
     const window = this.logWindows.get(windowKey);
@@ -456,7 +456,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Check anomaly condition (simplified implementation)
-   */
+    */
   private checkAnomalyCondition(condition: AnomalyCondition, entry: LogEntry): boolean {
     // This is a simplified implementation
     // In a real system, you'd use statistical analysis or ML models
@@ -473,7 +473,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Check chain condition
-   */
+    */
   private checkChainCondition(condition: ChainCondition, entry: LogEntry): boolean {
     const windowKey = `${condition.type}_${condition.maxChainTimeMs}`;
     const window = this.logWindows.get(windowKey);
@@ -522,7 +522,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Handle triggered alert
-   */
+    */
   private handleTriggeredAlert(entry: LogEntry, triggeredConditions: string[]): void {
     // Check cooldown period
     if (this.isInCooldown()) {
@@ -562,7 +562,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Check if rule is in cooldown period
-   */
+    */
   private isInCooldown(): boolean {
     if (!this.config.cooldownMs || !this.lastTriggered) {
       return false;
@@ -574,7 +574,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Check if rule is rate limited
-   */
+    */
   private isRateLimited(): boolean {
     if (!this.config.maxAlertsPerHour) {
       return false;
@@ -589,7 +589,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Execute configured actions
-   */
+    */
   private executeActions(alert: TriggeredAlert): void {
     this.config.actions.forEach(action => {
       if (action.enabled) {
@@ -602,7 +602,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Execute individual action
-   */
+    */
   private async executeAction(action: AlertAction, alert: TriggeredAlert): Promise<void> {
     // This would integrate with actual notification services
     // For now, we just emit an event
@@ -611,7 +611,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Utility methods
-   */
+    */
   private compareValues(actual: number, operator: string, expected: number): boolean {
     switch (operator) {
       case '>': return actual > expected;
@@ -640,7 +640,7 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Get rule statistics
-   */
+    */
   getStats(): AlertRuleStats {
     const now = new Date();
     const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -654,21 +654,21 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
   /**
    * Update rule configuration
-   */
+    */
   updateConfig(newConfig: Partial<AlertRuleConfig>): void {
     Object.assign(this.config, newConfig);
   }
 
   /**
    * Enable/disable rule
-   */
+    */
   setEnabled(enabled: boolean): void {
     this.config.enabled = enabled;
   }
 
   /**
    * Clear all windows and reset state
-   */
+    */
   reset(): void {
     this.logWindows.clear();
     this.alertsInLastHour = [];
@@ -678,13 +678,13 @@ export class AlertRule extends EventEmitter implements IAlertRule {
 
 /**
  * Alert rule manager for handling multiple rules
- */
+  */
 export class AlertRuleManager extends EventEmitter {
   private readonly rules: Map<string, AlertRule> = new Map();
 
   /**
    * Add new alert rule
-   */
+    */
   addRule(config: AlertRuleConfig): AlertRule {
     if (this.rules.has(config.id)) {
       throw new Error(`Rule with ID '${config.id}' already exists`);
@@ -703,7 +703,7 @@ export class AlertRuleManager extends EventEmitter {
 
   /**
    * Process log entry against all rules
-   */
+    */
   processLogEntry(entry: LogEntry): void {
     this.rules.forEach(rule => {
       rule.processLogEntry(entry);
@@ -712,28 +712,28 @@ export class AlertRuleManager extends EventEmitter {
 
   /**
    * Get rule by ID
-   */
+    */
   getRule(id: string): AlertRule | undefined {
     return this.rules.get(id);
   }
 
   /**
    * Remove rule
-   */
+    */
   removeRule(id: string): boolean {
     return this.rules.delete(id);
   }
 
   /**
    * Get all rule IDs
-   */
+    */
   getRuleIds(): string[] {
     return Array.from(this.rules.keys());
   }
 
   /**
    * Get manager statistics
-   */
+    */
   getStats(): {
     totalRules: number;
     enabledRules: number;
@@ -754,5 +754,5 @@ export class AlertRuleManager extends EventEmitter {
 
 /**
  * Global alert rule manager instance
- */
+  */
 export const globalAlertManager = new AlertRuleManager();

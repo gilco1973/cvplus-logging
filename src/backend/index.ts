@@ -13,7 +13,7 @@
  * - AuditTrail: Compliance-focused audit logging
  * - LogArchive: Long-term log storage and archival
  * - Types: TypeScript interfaces and enums
- */
+  */
 
 // Core services
 import { LoggerFactory } from './LoggerFactory';
@@ -68,22 +68,22 @@ export {
 
 /**
  * Quick start utility for creating a logger with sensible defaults
- */
+  */
 export function createLogger(serviceName: string, level?: import('./types/index').LogLevel) {
   return LoggerFactory.createLogger(serviceName, { level });
 }
 
 /**
  * Express middleware for automatic correlation ID handling
- */
+  */
 export const correlationMiddleware = CorrelationService.middleware();
 
 /**
  * Default logger instance for immediate use
- */
+  */
 export const logger = LoggerFactory.createLogger('@cvplus/core');
 
 /**
  * Version information
- */
+  */
 export const VERSION = '1.0.0';

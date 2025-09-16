@@ -1,7 +1,7 @@
 /**
  * T023: Core LogEntry Model - Foundation data model for the CVPlus logging system
  * This is the primary data structure that flows through the entire logging pipeline
- */
+  */
 
 import {
   LogLevel,
@@ -15,7 +15,7 @@ import {
 
 /**
  * Core LogEntry interface - the fundamental logging data structure
- */
+  */
 export interface ILogEntry {
   // Core identification
   id: string;
@@ -66,7 +66,7 @@ export interface ILogEntry {
 
 /**
  * LogEntry class implementation
- */
+  */
 export class LogEntry implements ILogEntry {
   public readonly id: string;
   public readonly timestamp: Date;
@@ -133,7 +133,7 @@ export class LogEntry implements ILogEntry {
 
   /**
    * Create a new LogEntry with minimal required fields
-   */
+    */
   static create(
     level: LogLevel,
     message: string,
@@ -154,7 +154,7 @@ export class LogEntry implements ILogEntry {
 
   /**
    * Generate a unique log entry ID
-   */
+    */
   private static generateId(): string {
     const timestamp = Date.now().toString(36);
     const random = Math.random().toString(36).substring(2, 8);
@@ -163,7 +163,7 @@ export class LogEntry implements ILogEntry {
 
   /**
    * Convert to plain object for serialization
-   */
+    */
   toObject(): Record<string, any> {
     return {
       id: this.id,
@@ -197,14 +197,14 @@ export class LogEntry implements ILogEntry {
 
   /**
    * Convert to JSON string
-   */
+    */
   toJSON(): string {
     return JSON.stringify(this.toObject());
   }
 
   /**
    * Create LogEntry from object (deserialization)
-   */
+    */
   static fromObject(obj: Record<string, any>): LogEntry {
     const entry = new LogEntry({
       id: obj.id,
@@ -244,14 +244,14 @@ export class LogEntry implements ILogEntry {
 
   /**
    * Create LogEntry from JSON string
-   */
+    */
   static fromJSON(json: string): LogEntry {
     return LogEntry.fromObject(JSON.parse(json));
   }
 
   /**
    * Check if the log entry contains sensitive information
-   */
+    */
   containsSensitiveData(): boolean {
     return this.sensitivityLevel === 'confidential' ||
            this.sensitivityLevel === 'restricted' ||
@@ -260,14 +260,14 @@ export class LogEntry implements ILogEntry {
 
   /**
    * Check if the log entry is an error log
-   */
+    */
   isError(): boolean {
     return this.level === LogLevel.ERROR || this.level === LogLevel.FATAL;
   }
 
   /**
    * Check if the log entry has performance metrics
-   */
+    */
   hasPerformanceData(): boolean {
     return this.performance !== undefined && (
       this.performance.duration !== undefined ||
@@ -278,42 +278,42 @@ export class LogEntry implements ILogEntry {
 
   /**
    * Get the age of the log entry in milliseconds
-   */
+    */
   getAge(): number {
     return Date.now() - this.timestamp.getTime();
   }
 
   /**
    * Check if the log entry should be archived based on age
-   */
+    */
   shouldArchive(maxAgeMs: number): boolean {
     return this.getAge() > maxAgeMs && !this.archived;
   }
 
   /**
    * Mark as processed
-   */
+    */
   markProcessed(): void {
     (this as any).processedAt = new Date();
   }
 
   /**
    * Mark as indexed
-   */
+    */
   markIndexed(): void {
     (this as any).indexed = true;
   }
 
   /**
    * Mark as archived
-   */
+    */
   markArchived(): void {
     (this as any).archived = true;
   }
 
   /**
    * Add or update a tag
-   */
+    */
   addTag(tag: string): void {
     if (!this.tags) {
       (this as any).tags = [];
@@ -325,7 +325,7 @@ export class LogEntry implements ILogEntry {
 
   /**
    * Remove a tag
-   */
+    */
   removeTag(tag: string): void {
     if (this.tags) {
       const index = this.tags.indexOf(tag);
@@ -337,21 +337,21 @@ export class LogEntry implements ILogEntry {
 
   /**
    * Check if the log entry has a specific tag
-   */
+    */
   hasTag(tag: string): boolean {
     return this.tags?.includes(tag) || false;
   }
 
   /**
    * Update metadata
-   */
+    */
   updateMetadata(metadata: Partial<LogMetadata>): void {
     (this as any).metadata = { ...this.metadata, ...metadata };
   }
 
   /**
    * Clone the log entry with modifications
-   */
+    */
   clone(modifications: Partial<ILogEntry> = {}): LogEntry {
     return new LogEntry({
       id: this.id,

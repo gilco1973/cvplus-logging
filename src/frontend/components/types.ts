@@ -1,6 +1,6 @@
 /**
  * Shared types for the LogsViewer dashboard components
- */
+  */
 
 import { LogLevel, LogDomain } from '../../backend/types/index';
 import type { LogEntry } from '../../backend/models/LogEntry';

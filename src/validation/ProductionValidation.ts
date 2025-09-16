@@ -1,7 +1,7 @@
 /**
  * Production validation and health checking utilities for the CVPlus logging system
  * Ensures logging system is production-ready with comprehensive validation
- */
+  */
 
 import { EventEmitter } from 'events';
 import { LogLevel, LoggerConfig } from '../backend/types/index';
@@ -46,7 +46,7 @@ export interface ProductionReadinessCheck {
 
 /**
  * Production validation engine
- */
+  */
 export class ProductionValidator extends EventEmitter {
   private validationRules: Array<(config: any) => Promise<ValidationResult[]>> = [];
   private healthCheckers: Array<() => Promise<ValidationResult[]>> = [];
@@ -58,7 +58,7 @@ export class ProductionValidator extends EventEmitter {
 
   /**
    * Initialize default production validation rules
-   */
+    */
   private initializeDefaultValidators(): void {
     // Configuration validation
     this.validationRules.push(this.validateLoggingConfiguration.bind(this));
@@ -75,7 +75,7 @@ export class ProductionValidator extends EventEmitter {
 
   /**
    * Validate logging configuration for production readiness
-   */
+    */
   private async validateLoggingConfiguration(config: LoggerConfig): Promise<ValidationResult[]> {
     const results: ValidationResult[] = [];
 
@@ -152,7 +152,7 @@ export class ProductionValidator extends EventEmitter {
 
   /**
    * Validate security settings
-   */
+    */
   private async validateSecuritySettings(config: any): Promise<ValidationResult[]> {
     const results: ValidationResult[] = [];
 
@@ -206,7 +206,7 @@ export class ProductionValidator extends EventEmitter {
 
   /**
    * Validate performance settings
-   */
+    */
   private async validatePerformanceSettings(config: any): Promise<ValidationResult[]> {
     const results: ValidationResult[] = [];
 
@@ -246,7 +246,7 @@ export class ProductionValidator extends EventEmitter {
 
   /**
    * Validate retention policies
-   */
+    */
   private async validateRetentionPolicies(config: any): Promise<ValidationResult[]> {
     const results: ValidationResult[] = [];
 
@@ -286,7 +286,7 @@ export class ProductionValidator extends EventEmitter {
 
   /**
    * Check system resources
-   */
+    */
   private async checkSystemResources(): Promise<ValidationResult[]> {
     const results: ValidationResult[] = [];
 
@@ -335,7 +335,7 @@ export class ProductionValidator extends EventEmitter {
 
   /**
    * Check log storage health
-   */
+    */
   private async checkLogStorage(): Promise<ValidationResult[]> {
     const results: ValidationResult[] = [];
 
@@ -396,7 +396,7 @@ export class ProductionValidator extends EventEmitter {
 
   /**
    * Check network connectivity for remote logging
-   */
+    */
   private async checkNetworkConnectivity(): Promise<ValidationResult[]> {
     const results: ValidationResult[] = [];
 
@@ -464,7 +464,7 @@ export class ProductionValidator extends EventEmitter {
 
   /**
    * Check health of logging system dependencies
-   */
+    */
   private async checkDependencyHealth(): Promise<ValidationResult[]> {
     const results: ValidationResult[] = [];
 
@@ -513,7 +513,7 @@ export class ProductionValidator extends EventEmitter {
 
   /**
    * Run complete production validation
-   */
+    */
   async validateProduction(config: any): Promise<ProductionReadinessCheck> {
     const allResults: ValidationResult[] = [];
 
@@ -572,7 +572,7 @@ export class ProductionValidator extends EventEmitter {
 
   /**
    * Generate system health report
-   */
+    */
   async generateHealthReport(): Promise<SystemHealthReport> {
     const validationResults: ValidationResult[] = [];
 
@@ -629,7 +629,7 @@ export class ProductionValidator extends EventEmitter {
 
   /**
    * Generate production readiness checklist
-   */
+    */
   private generateChecklist(results: ValidationResult[]): Array<{
     category: string;
     items: Array<{ name: string; status: 'pass' | 'fail' | 'warning' }>;

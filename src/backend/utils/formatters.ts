@@ -1,7 +1,7 @@
 /**
  * T020: Log formatters and PII redaction
  * CVPlus Logging System - Formatting and Data Protection
- */
+  */
 
 import { LogEntry, ErrorInfo, PerformanceInfo, LogFormatter } from '../types/index';
 
@@ -52,7 +52,7 @@ export class CVPlusLogFormatter implements LogFormatter {
 
   /**
    * Format complete log entry
-   */
+    */
   format(entry: LogEntry): string {
     const formattedEntry = {
       timestamp: new Date(entry.timestamp).toISOString(),
@@ -80,7 +80,7 @@ export class CVPlusLogFormatter implements LogFormatter {
 
   /**
    * Format error information with proper structure
-   */
+    */
   formatError(error: ErrorInfo): string {
     const formatted: ErrorInfo = {
       message: error.message,
@@ -108,7 +108,7 @@ export class CVPlusLogFormatter implements LogFormatter {
 
   /**
    * Format performance information
-   */
+    */
   formatPerformance(perf: PerformanceInfo): string {
     const formatted: PerformanceInfo = {};
 
@@ -140,7 +140,7 @@ export class CVPlusLogFormatter implements LogFormatter {
 
   /**
    * Redact PII from data structures
-   */
+    */
   redactPII(data: any): any {
     if (!this.enablePIIRedaction || data === null || data === undefined) {
       return data;
@@ -164,7 +164,7 @@ export class CVPlusLogFormatter implements LogFormatter {
 
   /**
    * Redact PII from string content
-   */
+    */
   private redactStringPII(str: string): string {
     let redacted = str;
 
@@ -178,7 +178,7 @@ export class CVPlusLogFormatter implements LogFormatter {
 
   /**
    * Redact PII from object properties
-   */
+    */
   private redactObjectPII(obj: Record<string, any>): Record<string, any> {
     const result: Record<string, any> = {};
     const allSensitiveFields = [...SENSITIVE_FIELDS, ...this.customSensitiveFields];
@@ -210,7 +210,7 @@ export class CVPlusLogFormatter implements LogFormatter {
 
   /**
    * Redact IP address (keep first 3 octets for IPv4, first 4 groups for IPv6)
-   */
+    */
   private redactIPAddress(ip: string): string {
     if (!ip || typeof ip !== 'string') return ip;
 
@@ -233,7 +233,7 @@ export class CVPlusLogFormatter implements LogFormatter {
 
   /**
    * Redact user agent (keep browser/platform info, remove specific versions)
-   */
+    */
   private redactUserAgent(userAgent: string): string {
     if (!userAgent || typeof userAgent !== 'string') return userAgent;
 
@@ -254,7 +254,7 @@ export class CVPlusLogFormatter implements LogFormatter {
 
   /**
    * Sanitize stack traces to remove potential file path information
-   */
+    */
   private sanitizeStackTrace(stack: string): string {
     return stack
       .split('\n')
@@ -267,7 +267,7 @@ export class CVPlusLogFormatter implements LogFormatter {
 
   /**
    * Create a simple text formatter for console output
-   */
+    */
   formatSimple(entry: LogEntry): string {
     const timestamp = new Date(entry.timestamp).toISOString();
     const level = entry.level.toUpperCase().padEnd(5);
@@ -295,7 +295,7 @@ export class CVPlusLogFormatter implements LogFormatter {
 
   /**
    * Create a detailed formatter with color coding (for development)
-   */
+    */
   formatDetailed(entry: LogEntry): string {
     const colors = {
       error: '\x1b[31m', // Red

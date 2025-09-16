@@ -1,7 +1,7 @@
 /**
  * T018: Core logging types implementation
  * CVPlus Logging System - Core Type Definitions
- */
+  */
 
 import { LeveledLogMethod, Logger as WinstonLogger } from 'winston';
 

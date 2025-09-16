@@ -1,7 +1,7 @@
 /**
  * T022: LoggerFactory implementation
  * CVPlus Logging System - Logger Factory for Service Management
- */
+  */
 
 import { Logger as WinstonLogger } from 'winston';
 import {
@@ -20,7 +20,7 @@ export class LoggerFactory {
 
   /**
    * Initialize the factory with global configuration
-   */
+    */
   static initialize(config: Partial<LoggerFactoryConfig> = {}): void {
     LoggerFactory.config = { ...DEFAULT_FACTORY_CONFIG, ...config };
     LoggerFactory.initialized = true;
@@ -28,7 +28,7 @@ export class LoggerFactory {
 
   /**
    * Create or retrieve a logger for a service
-   */
+    */
   static createLogger(serviceName: string, config: Partial<LoggerConfig> = {}): BaseLogger {
     // Ensure factory is initialized
     if (!LoggerFactory.initialized) {
@@ -62,7 +62,7 @@ export class LoggerFactory {
 
   /**
    * Get existing logger by service name
-   */
+    */
   static getLogger(serviceName: string): BaseLogger {
     const logger = LoggerFactory.loggers.get(serviceName);
     if (!logger) {
@@ -73,14 +73,14 @@ export class LoggerFactory {
 
   /**
    * Check if logger exists for service
-   */
+    */
   static hasLogger(serviceName: string): boolean {
     return LoggerFactory.loggers.has(serviceName);
   }
 
   /**
    * Get all registered loggers
-   */
+    */
   static getAllLoggers(): Record<string, BaseLogger> {
     const result: Record<string, BaseLogger> = {};
     LoggerFactory.loggers.forEach((logger, serviceName) => {
@@ -91,7 +91,7 @@ export class LoggerFactory {
 
   /**
    * Update log level for specific logger
-   */
+    */
   static updateLogLevel(serviceName: string, level: LogLevel): void;
   static updateLogLevel(level: LogLevel): void;
   static updateLogLevel(serviceNameOrLevel: string | LogLevel, level?: LogLevel): void {
@@ -113,7 +113,7 @@ export class LoggerFactory {
 
   /**
    * Remove logger for service
-   */
+    */
   static removeLogger(serviceName: string): boolean {
     const logger = LoggerFactory.loggers.get(serviceName);
     if (logger) {
@@ -126,7 +126,7 @@ export class LoggerFactory {
 
   /**
    * Clear all loggers
-   */
+    */
   static reset(): void {
     LoggerFactory.loggers.forEach(logger => {
       logger.destroy();
@@ -136,14 +136,14 @@ export class LoggerFactory {
 
   /**
    * Get factory configuration
-   */
+    */
   static getConfig(): Required<LoggerFactoryConfig> {
     return { ...LoggerFactory.config };
   }
 
   /**
    * Update factory configuration
-   */
+    */
   static updateConfig(newConfig: Partial<LoggerFactoryConfig>): void {
     LoggerFactory.config = { ...LoggerFactory.config, ...newConfig };
 
@@ -157,21 +157,21 @@ export class LoggerFactory {
 
   /**
    * Get logger count
-   */
+    */
   static getLoggerCount(): number {
     return LoggerFactory.loggers.size;
   }
 
   /**
    * Get logger names
-   */
+    */
   static getLoggerNames(): string[] {
     return Array.from(LoggerFactory.loggers.keys());
   }
 
   /**
    * Create logger with Winston instance (for compatibility)
-   */
+    */
   static createWinstonLogger(serviceName: string, config: Partial<LoggerConfig> = {}): WinstonLogger {
     const logger = LoggerFactory.createLogger(serviceName, config);
     return (logger as any).winston as WinstonLogger;
@@ -179,7 +179,7 @@ export class LoggerFactory {
 
   /**
    * Batch create loggers for multiple services
-   */
+    */
   static createLoggers(
     services: Array<{ name: string; config?: Partial<LoggerConfig> }>
   ): Record<string, BaseLogger> {
@@ -194,7 +194,7 @@ export class LoggerFactory {
 
   /**
    * Health check for all loggers
-   */
+    */
   static healthCheck(): {
     healthy: boolean;
     loggerCount: number;
@@ -235,7 +235,7 @@ export class LoggerFactory {
 
   /**
    * Create specialized logger with predefined configuration
-   */
+    */
   static createSpecializedLogger(
     serviceName: string,
     specialization: 'security' | 'performance' | 'audit' | 'business',
@@ -276,7 +276,7 @@ export class LoggerFactory {
 
   /**
    * Graceful shutdown - flush and close all loggers
-   */
+    */
   static async shutdown(): Promise<void> {
     const shutdownPromises: Promise<void>[] = [];
 

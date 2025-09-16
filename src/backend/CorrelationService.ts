@@ -3,7 +3,7 @@
  *
  * Manages correlation IDs for tracking requests across multiple services and packages
  * Uses Node.js AsyncLocalStorage for context management in async operations
- */
+  */
 
 import { AsyncLocalStorage } from 'async_hooks';
 import { nanoid } from 'nanoid';
@@ -17,13 +17,13 @@ interface CorrelationContext {
 
 /**
  * Service for managing correlation IDs across async operations
- */
+  */
 export class CorrelationService {
   private static asyncLocalStorage = new AsyncLocalStorage<CorrelationContext>();
 
   /**
    * Generate a new unique correlation ID
-   */
+    */
   static generateId(prefix?: string): string {
     const id = nanoid(12); // 12 character nanoid for good uniqueness and readability
     return prefix ? `${prefix}-${id}` : id;
@@ -31,7 +31,7 @@ export class CorrelationService {
 
   /**
    * Set the current correlation ID for the async context
-   */
+    */
   static setCurrentId(correlationId: string): void {
     const currentContext = this.asyncLocalStorage.getStore();
     const newContext: CorrelationContext = {
@@ -45,7 +45,7 @@ export class CorrelationService {
 
   /**
    * Get the current correlation ID from async context
-   */
+    */
   static getCurrentId(): string | null {
     const context = this.asyncLocalStorage.getStore();
     return context?.correlationId || null;
@@ -53,14 +53,14 @@ export class CorrelationService {
 
   /**
    * Get the current correlation context (including parent and timing info)
-   */
+    */
   static getCurrentContext(): CorrelationContext | null {
     return this.asyncLocalStorage.getStore() || null;
   }
 
   /**
    * Execute a function with a specific correlation ID
-   */
+    */
   static withCorrelationId<T>(
     correlationId: string,
     callback: () => T | Promise<T>
@@ -77,7 +77,7 @@ export class CorrelationService {
 
   /**
    * Execute a function with a new generated correlation ID
-   */
+    */
   static withNewCorrelationId<T>(
     callback: () => T | Promise<T>,
     prefix?: string
@@ -88,14 +88,14 @@ export class CorrelationService {
 
   /**
    * Clear the current correlation context
-   */
+    */
   static clear(): void {
     this.asyncLocalStorage.disable();
   }
 
   /**
    * Create Express middleware for automatic correlation ID handling
-   */
+    */
   static middleware() {
     return (req: Request, res: Response, next: NextFunction): void => {
       // Check for existing correlation ID in headers
@@ -120,7 +120,7 @@ export class CorrelationService {
 
   /**
    * Create a child correlation ID for nested operations
-   */
+    */
   static createChild(suffix?: string): string {
     const currentId = this.getCurrentId();
     if (!currentId) {
@@ -133,7 +133,7 @@ export class CorrelationService {
 
   /**
    * Get timing information for the current correlation context
-   */
+    */
   static getElapsedTime(): number | null {
     const context = this.asyncLocalStorage.getStore();
     if (!context) {
@@ -145,7 +145,7 @@ export class CorrelationService {
 
   /**
    * Create a correlation chain for tracking nested operations
-   */
+    */
   static createChain(): {
     parentId: string | null;
     currentId: string;
@@ -166,7 +166,7 @@ export class CorrelationService {
 
   /**
    * Bind a function to preserve correlation context
-   */
+    */
   static bind<Args extends any[], Return>(
     fn: (...args: Args) => Return
   ): (...args: Args) => Return {
@@ -182,7 +182,7 @@ export class CorrelationService {
 
   /**
    * Bind a promise-returning function to preserve correlation context
-   */
+    */
   static bindAsync<Args extends any[], Return>(
     fn: (...args: Args) => Promise<Return>
   ): (...args: Args) => Promise<Return> {
@@ -198,7 +198,7 @@ export class CorrelationService {
 
   /**
    * Get a summary of the correlation chain for debugging
-   */
+    */
   static getChainSummary(): {
     current: string | null;
     parent: string | null;
@@ -218,7 +218,7 @@ export class CorrelationService {
 
   /**
    * Utility for debugging correlation context
-   */
+    */
   static debug(): void {
     const summary = this.getChainSummary();
     console.log('[CorrelationService Debug]', {

@@ -1,7 +1,7 @@
 /**
  * Index file for logging dashboard components
  * Exports all refactored components for the logs viewer
- */
+  */
 
 export { LogsViewerDashboard } from './LogsViewerDashboard';
 export { LogsViewerHeader } from './LogsViewerHeader';

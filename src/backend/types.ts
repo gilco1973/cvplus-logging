@@ -1,11 +1,11 @@
 /**
  * Core logging types for CVPlus platform
  * These types define the structure for comprehensive logging system
- */
+  */
 
 /**
  * Log severity levels following RFC 5424 standard
- */
+  */
 export enum LogLevel {
   DEBUG = 'debug',
   INFO = 'info',
@@ -16,7 +16,7 @@ export enum LogLevel {
 
 /**
  * Log domain categories for organizing logs by functional area
- */
+  */
 export enum LogDomain {
   SECURITY = 'security',
   PERFORMANCE = 'performance',
@@ -27,7 +27,7 @@ export enum LogDomain {
 
 /**
  * Alert severity levels
- */
+  */
 export enum AlertSeverity {
   LOW = 'low',
   INFO = 'info',
@@ -38,7 +38,7 @@ export enum AlertSeverity {
 
 /**
  * Audit actions
- */
+  */
 export enum AuditAction {
   CREATE = 'create',
   READ = 'read',
@@ -54,7 +54,7 @@ export enum AuditAction {
 
 /**
  * Error details structure for log entries
- */
+  */
 export interface LogError {
   name: string;
   message: string;
@@ -65,7 +65,7 @@ export interface LogError {
 
 /**
  * Performance metrics structure for log entries
- */
+  */
 export interface LogPerformance {
   duration?: number; // milliseconds
   memoryUsage?: number; // bytes
@@ -77,7 +77,7 @@ export interface LogPerformance {
 
 /**
  * Core log entry structure
- */
+  */
 export interface LogEntry {
   timestamp: string; // ISO 8601 format
   level: LogLevel;
@@ -95,7 +95,7 @@ export interface LogEntry {
 
 /**
  * Log stream configuration
- */
+  */
 export interface LogStream {
   id: string;
   name: string;
@@ -109,7 +109,7 @@ export interface LogStream {
 
 /**
  * Alert rule configuration
- */
+  */
 export interface AlertRule {
   id: string;
   name: string;
@@ -122,7 +122,7 @@ export interface AlertRule {
 
 /**
  * Alert condition types
- */
+  */
 export interface AlertCondition {
   level?: LogLevel;
   domain?: LogDomain;
@@ -137,7 +137,7 @@ export interface AlertCondition {
 
 /**
  * Alert action types
- */
+  */
 export interface AlertAction {
   type: 'email' | 'webhook' | 'slack' | 'firebase';
   config: Record<string, unknown>;
@@ -145,7 +145,7 @@ export interface AlertAction {
 
 /**
  * Audit trail entry
- */
+  */
 export interface AuditTrail {
   id: string;
   timestamp: string;
@@ -161,7 +161,7 @@ export interface AuditTrail {
 
 /**
  * Logger configuration options
- */
+  */
 export interface LoggerConfig {
   level?: LogLevel;
   service?: string;
@@ -178,7 +178,7 @@ export interface LoggerConfig {
 
 /**
  * Transport configuration for different log outputs
- */
+  */
 export interface TransportConfig {
   console?: {
     level: LogLevel;
@@ -205,7 +205,7 @@ export interface TransportConfig {
 
 /**
  * Formatted log entry for different outputs
- */
+  */
 export interface FormattedLogEntry {
   '@timestamp': string;
   level: string;
@@ -221,7 +221,7 @@ export interface FormattedLogEntry {
 
 /**
  * Firebase Cloud Logging format
- */
+  */
 export interface FirebaseLogEntry {
   timestamp: string;
   severity: string;
@@ -236,7 +236,7 @@ export interface FirebaseLogEntry {
 
 /**
  * PII redaction configuration
- */
+  */
 export interface PiiRedactionConfig {
   enabled: boolean;
   patterns: Record<string, RegExp>;
@@ -245,7 +245,7 @@ export interface PiiRedactionConfig {
 
 /**
  * Log aggregation metrics
- */
+  */
 export interface LogMetrics {
   timestamp: string;
   period: number; // minutes
@@ -271,7 +271,7 @@ export interface LogMetrics {
 
 /**
  * Logger interface that all loggers must implement
- */
+  */
 export interface Logger {
   debug(message: string, context?: Record<string, unknown>): void;
   info(message: string, context?: Record<string, unknown>): void;
@@ -292,7 +292,7 @@ export interface Logger {
 
 /**
  * Logger factory interface
- */
+  */
 export interface LoggerFactory {
   createLogger(service: string, config?: LoggerConfig): Logger;
   getLogger(service: string): Logger;

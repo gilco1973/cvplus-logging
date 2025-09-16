@@ -1,7 +1,7 @@
 /**
  * T026: Firebase Functions-specific logging implementation
  * CVPlus Logging System - Function Execution Logger
- */
+  */
 
 import { BaseLogger } from '../core/BaseLogger';
 import { LogLevel, LogDomain } from '../types';
@@ -16,7 +16,7 @@ export class FunctionLogger extends BaseLogger {
 
   /**
    * Log function invocation
-   */
+    */
   functionInvoked(context: {
     functionName?: string;
     userId?: string;
@@ -43,7 +43,7 @@ export class FunctionLogger extends BaseLogger {
 
   /**
    * Log function completion
-   */
+    */
   functionCompleted(context: {
     functionName?: string;
     userId?: string;
@@ -80,7 +80,7 @@ export class FunctionLogger extends BaseLogger {
 
   /**
    * Log function failures
-   */
+    */
   functionFailed(context: {
     functionName?: string;
     userId?: string;
@@ -123,7 +123,7 @@ export class FunctionLogger extends BaseLogger {
 
   /**
    * Log authentication context
-   */
+    */
   authenticationContext(context: {
     uid?: string;
     email?: string;
@@ -148,7 +148,7 @@ export class FunctionLogger extends BaseLogger {
 
   /**
    * Log authorization failures
-   */
+    */
   authorizationFailed(context: {
     uid?: string;
     attemptedAction?: string;
@@ -173,7 +173,7 @@ export class FunctionLogger extends BaseLogger {
 
   /**
    * Log external service calls
-   */
+    */
   externalServiceCall(context: {
     service?: string;
     endpoint?: string;
@@ -215,7 +215,7 @@ export class FunctionLogger extends BaseLogger {
 
   /**
    * Log database operations
-   */
+    */
   databaseOperation(context: {
     operation?: string;
     collection?: string;
@@ -248,7 +248,7 @@ export class FunctionLogger extends BaseLogger {
 
   /**
    * Log resource usage
-   */
+    */
   resourceUsage(context: {
     memoryAllocated?: number;
     memoryUsed?: number;
@@ -281,7 +281,7 @@ export class FunctionLogger extends BaseLogger {
 
   /**
    * Log timeout warnings
-   */
+    */
   timeoutWarning(context: {
     functionName?: string;
     executionTime?: number;
@@ -308,14 +308,14 @@ export class FunctionLogger extends BaseLogger {
 
   /**
    * Get last log entry (for testing)
-   */
+    */
   getLastLogEntry() {
     return super.getLastLogEntry();
   }
 
   /**
    * Get all log entries (for testing)
-   */
+    */
   getAllLogEntries() {
     return super.getAllLogEntries();
   }

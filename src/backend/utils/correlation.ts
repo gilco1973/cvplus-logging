@@ -1,7 +1,7 @@
 /**
  * T019: Correlation ID management utilities
  * CVPlus Logging System - Correlation Tracking
- */
+  */
 
 import { nanoid } from 'nanoid';
 import { createNamespace, getNamespace, Namespace } from 'cls-hooked';
@@ -28,28 +28,28 @@ export class CorrelationManager {
 
   /**
    * Generate a new correlation ID using nanoid
-   */
+    */
   generateCorrelationId(): string {
     return nanoid(21); // 21 characters for good uniqueness without being too long
   }
 
   /**
    * Set correlation context for the current execution flow
-   */
+    */
   setCorrelationContext(context: CorrelationContext): void {
     this.namespace.set('correlationContext', context);
   }
 
   /**
    * Get current correlation context
-   */
+    */
   getCorrelationContext(): CorrelationContext | null {
     return this.namespace.get('correlationContext') || null;
   }
 
   /**
    * Get current correlation ID
-   */
+    */
   getCurrentCorrelationId(): string | null {
     const context = this.getCorrelationContext();
     return context?.correlationId || null;
@@ -57,7 +57,7 @@ export class CorrelationManager {
 
   /**
    * Execute callback with specific correlation context
-   */
+    */
   withCorrelation<T>(correlationId: string, callback: () => T): T {
     return this.namespace.runAndReturn(() => {
       const existingContext = this.getCorrelationContext() || {};
@@ -71,7 +71,7 @@ export class CorrelationManager {
 
   /**
    * Execute callback with new correlation context
-   */
+    */
   withNewCorrelation<T>(callback: (correlationId: string) => T): T {
     const correlationId = this.generateCorrelationId();
     return this.withCorrelation(correlationId, () => callback(correlationId));
@@ -79,7 +79,7 @@ export class CorrelationManager {
 
   /**
    * Add user context to current correlation
-   */
+    */
   addUserContext(userId: string, sessionId?: string): void {
     const context = this.getCorrelationContext();
     this.setCorrelationContext({
@@ -92,7 +92,7 @@ export class CorrelationManager {
 
   /**
    * Add request context to current correlation
-   */
+    */
   addRequestContext(requestId: string, traceId?: string): void {
     const context = this.getCorrelationContext();
     this.setCorrelationContext({
@@ -105,7 +105,7 @@ export class CorrelationManager {
 
   /**
    * Create child correlation from parent
-   */
+    */
   createChildCorrelation(parentCorrelationId?: string): string {
     const childCorrelationId = this.generateCorrelationId();
     const existingContext = this.getCorrelationContext();
@@ -121,21 +121,21 @@ export class CorrelationManager {
 
   /**
    * Clear correlation context
-   */
+    */
   clearCorrelation(): void {
     this.namespace.set('correlationContext', null);
   }
 
   /**
    * Check if correlation tracking is active
-   */
+    */
   isCorrelationActive(): boolean {
     return this.getCurrentCorrelationId() !== null;
   }
 
   /**
    * Get correlation chain information
-   */
+    */
   getCorrelationChain(): {
     correlationId: string;
     parentId?: string;
@@ -163,7 +163,7 @@ export class CorrelationManager {
 
   /**
    * Extract correlation ID from various sources (headers, context, etc.)
-   */
+    */
   extractCorrelationId(sources: {
     headers?: Record<string, string | string[] | undefined>;
     context?: Record<string, any>;
@@ -197,7 +197,7 @@ export class CorrelationManager {
 
   /**
    * Validate correlation ID format
-   */
+    */
   isValidCorrelationId(correlationId: string): boolean {
     // nanoid generates URL-safe characters: A-Za-z0-9_-
     // Standard length is 21 characters
@@ -206,7 +206,7 @@ export class CorrelationManager {
 
   /**
    * Sanitize correlation ID to ensure it's safe for logging
-   */
+    */
   sanitizeCorrelationId(correlationId: string): string | null {
     if (!correlationId || typeof correlationId !== 'string') {
       return null;

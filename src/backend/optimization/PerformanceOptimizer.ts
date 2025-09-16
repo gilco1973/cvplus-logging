@@ -3,7 +3,7 @@
  *
  * Advanced performance optimization utilities for the logging system including
  * batch processing, memory management, connection pooling, and intelligent caching.
- */
+  */
 
 import { LogLevel, LogDomain } from '../types';
 import { LogEntry } from '../models/LogEntry';
@@ -171,7 +171,7 @@ export class PerformanceOptimizer extends EventEmitter {
 
   /**
    * Optimize log batch processing
-   */
+    */
   async processBatch(logs: LogEntry[], options: {
     priority?: 'low' | 'normal' | 'high';
     timeout?: number;
@@ -362,7 +362,7 @@ export class PerformanceOptimizer extends EventEmitter {
 
   /**
    * Cache management
-   */
+    */
   private getFromCache(log: LogEntry): any | null {
     const key = this.getCacheKey(log);
     const cached = this.cache.get(key);
@@ -404,7 +404,7 @@ export class PerformanceOptimizer extends EventEmitter {
 
   /**
    * Memory management
-   */
+    */
   private startMemoryMonitoring(): void {
     this.memoryTimer = setInterval(() => {
       this.checkMemoryUsage();
@@ -454,7 +454,7 @@ export class PerformanceOptimizer extends EventEmitter {
 
   /**
    * Performance metrics collection
-   */
+    */
   private startMetricsCollection(): void {
     this.metricsTimer = setInterval(() => {
       this.updatePerformanceMetrics();
@@ -556,7 +556,7 @@ export class PerformanceOptimizer extends EventEmitter {
 
   /**
    * Get current performance metrics
-   */
+    */
   getMetrics(): PerformanceMetrics {
     this.updatePerformanceMetrics();
     return { ...this.metrics };
@@ -564,7 +564,7 @@ export class PerformanceOptimizer extends EventEmitter {
 
   /**
    * Get optimization recommendations
-   */
+    */
   getOptimizationRecommendations(): string[] {
     const recommendations: string[] = [];
     const metrics = this.getMetrics();
@@ -598,7 +598,7 @@ export class PerformanceOptimizer extends EventEmitter {
 
   /**
    * Update optimization configuration
-   */
+    */
   updateConfig(newConfig: Partial<OptimizationConfig>): void {
     const oldConfig = { ...this.config };
     this.config = { ...this.config, ...newConfig };
@@ -614,7 +614,7 @@ export class PerformanceOptimizer extends EventEmitter {
 
   /**
    * Cleanup and shutdown
-   */
+    */
   shutdown(): void {
     if (this.metricsTimer) clearInterval(this.metricsTimer);
     if (this.memoryTimer) clearInterval(this.memoryTimer);

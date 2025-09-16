@@ -3,7 +3,7 @@
  *
  * This factory provides standardized logging implementations for all remaining packages,
  * ensuring consistency while allowing package-specific customizations.
- */
+  */
 
 import {
   LoggerFactory,
@@ -15,7 +15,7 @@ import { BaseLogger } from './core/BaseLogger';
 
 /**
  * Generic package logger interface
- */
+  */
 export interface PackageLogger {
   info(message: string, context?: Record<string, any>): void;
   warn(message: string, context?: Record<string, any>): void;
@@ -27,7 +27,7 @@ export interface PackageLogger {
 
 /**
  * Base package logger implementation
- */
+  */
 export abstract class BasePackageLogger implements PackageLogger {
   protected readonly logger: BaseLogger;
   protected readonly packageName: string;
@@ -81,7 +81,7 @@ export abstract class BasePackageLogger implements PackageLogger {
 
 /**
  * T032: Analytics Logger
- */
+  */
 export class AnalyticsLogger extends BasePackageLogger {
   constructor() {
     super('@cvplus/analytics');
@@ -125,7 +125,7 @@ export class AnalyticsLogger extends BasePackageLogger {
 
 /**
  * T033: Premium Logger
- */
+  */
 export class PremiumLogger extends BasePackageLogger {
   constructor() {
     super('@cvplus/premium');
@@ -170,7 +170,7 @@ export class PremiumLogger extends BasePackageLogger {
 
 /**
  * T034: Recommendations Logger
- */
+  */
 export class RecommendationsLogger extends BasePackageLogger {
   constructor() {
     super('@cvplus/recommendations');
@@ -215,7 +215,7 @@ export class RecommendationsLogger extends BasePackageLogger {
 
 /**
  * T035: Public Profiles Logger
- */
+  */
 export class ProfilesLogger extends BasePackageLogger {
   constructor() {
     super('@cvplus/public-profiles');
@@ -258,7 +258,7 @@ export class ProfilesLogger extends BasePackageLogger {
 
 /**
  * T036: Admin Logger
- */
+  */
 export class AdminLogger extends BasePackageLogger {
   constructor() {
     super('@cvplus/admin');
@@ -304,7 +304,7 @@ export class AdminLogger extends BasePackageLogger {
 
 /**
  * T037: Workflow Logger
- */
+  */
 export class WorkflowLogger extends BasePackageLogger {
   constructor() {
     super('@cvplus/workflow');
@@ -349,7 +349,7 @@ export class WorkflowLogger extends BasePackageLogger {
 
 /**
  * T038: Payments Logger
- */
+  */
 export class PaymentsLogger extends BasePackageLogger {
   constructor() {
     super('@cvplus/payments');
@@ -403,7 +403,7 @@ export class PaymentsLogger extends BasePackageLogger {
 
 /**
  * Factory function to create package loggers
- */
+  */
 export function createPackageLogger(packageName: string): PackageLogger {
   switch (packageName) {
     case '@cvplus/analytics':
@@ -427,7 +427,7 @@ export function createPackageLogger(packageName: string): PackageLogger {
 
 /**
  * Export all logger instances
- */
+  */
 export const analyticsLogger = new AnalyticsLogger();
 export const premiumLogger = new PremiumLogger();
 export const recommendationsLogger = new RecommendationsLogger();
@@ -438,7 +438,7 @@ export const paymentsLogger = new PaymentsLogger();
 
 /**
  * Consolidated logging utilities
- */
+  */
 export const packageLogging = {
   analytics: analyticsLogger,
   premium: premiumLogger,

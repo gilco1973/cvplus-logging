@@ -1,7 +1,7 @@
 /**
  * T026: Security-specific logging implementation
  * CVPlus Logging System - Security Event Logger
- */
+  */
 
 import { BaseLogger } from '../core/BaseLogger';
 import { LogLevel, LogDomain } from '../types';
@@ -16,7 +16,7 @@ export class SecurityLogger extends BaseLogger {
 
   /**
    * Log brute force attack detection
-   */
+    */
   bruteForceDetected(context: {
     ipAddress?: string;
     targetEmail?: string;
@@ -44,7 +44,7 @@ export class SecurityLogger extends BaseLogger {
 
   /**
    * Log account takeover attempts
-   */
+    */
   accountTakeoverAttempt(context: {
     userId?: string;
     suspiciousActivities?: string[];
@@ -71,7 +71,7 @@ export class SecurityLogger extends BaseLogger {
 
   /**
    * Log MFA bypass attempts
-   */
+    */
   mfaBypassAttempt(context: {
     userId?: string;
     bypassMethod?: string;
@@ -100,7 +100,7 @@ export class SecurityLogger extends BaseLogger {
 
   /**
    * Log privilege escalation attempts
-   */
+    */
   privilegeEscalationAttempt(context: {
     userId?: string;
     currentRole?: string;
@@ -130,7 +130,7 @@ export class SecurityLogger extends BaseLogger {
 
   /**
    * Log unauthorized API access attempts
-   */
+    */
   unauthorizedAPIAccess(context: {
     userId?: string;
     endpoint?: string;
@@ -160,7 +160,7 @@ export class SecurityLogger extends BaseLogger {
 
   /**
    * Log sensitive data access events
-   */
+    */
   sensitiveDataAccess(context: {
     userId?: string;
     adminUserId?: string;
@@ -193,7 +193,7 @@ export class SecurityLogger extends BaseLogger {
 
   /**
    * Log data privacy requests
-   */
+    */
   dataPrivacyRequest(context: {
     userId?: string;
     requestType?: string;
@@ -226,7 +226,7 @@ export class SecurityLogger extends BaseLogger {
 
   /**
    * Log suspicious system activity
-   */
+    */
   systemSuspiciousActivity(context: {
     pattern?: string;
     metrics?: {
@@ -258,7 +258,7 @@ export class SecurityLogger extends BaseLogger {
 
   /**
    * Log security configuration changes
-   */
+    */
   securityConfigurationChange(context: {
     adminUserId?: string;
     configType?: string;
@@ -288,21 +288,21 @@ export class SecurityLogger extends BaseLogger {
 
   /**
    * Execute callback with correlation ID context
-   */
+    */
   withCorrelation(correlationId: string, callback: () => string): string {
     return super.withCorrelation(correlationId, callback);
   }
 
   /**
    * Get last log entry (for testing)
-   */
+    */
   getLastLogEntry() {
     return super.getLastLogEntry();
   }
 
   /**
    * Get all log entries (for testing)
-   */
+    */
   getAllLogEntries() {
     return super.getAllLogEntries();
   }

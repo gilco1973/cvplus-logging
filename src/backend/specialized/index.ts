@@ -1,7 +1,7 @@
 /**
  * T023-T026: Specialized logger implementations
  * CVPlus Logging System - Domain-Specific Loggers
- */
+  */
 
 export { AuthLogger } from './AuthLogger';
 export { ProcessingLogger } from './ProcessingLogger';

@@ -1,7 +1,7 @@
 /**
  * T024: CV Processing-specific logging implementation
  * CVPlus Logging System - CV Processing Module Logger
- */
+  */
 
 import { BaseLogger } from '../core/BaseLogger';
 import { LogLevel, LogDomain } from '../types';
@@ -16,7 +16,7 @@ export class ProcessingLogger extends BaseLogger {
 
   /**
    * Log CV processing start
-   */
+    */
   processingStarted(context: {
     userId?: string;
     cvId?: string;
@@ -38,7 +38,7 @@ export class ProcessingLogger extends BaseLogger {
 
   /**
    * Log CV processing completion
-   */
+    */
   processingCompleted(context: {
     cvId?: string;
     processingDuration?: number;
@@ -64,7 +64,7 @@ export class ProcessingLogger extends BaseLogger {
 
   /**
    * Log CV processing failures
-   */
+    */
   processingFailed(context: {
     cvId?: string;
     errorType?: string;
@@ -95,7 +95,7 @@ export class ProcessingLogger extends BaseLogger {
 
   /**
    * Log feature-specific processing events
-   */
+    */
   featureProcessed(feature: string, data: any): string {
     const messageMap: Record<string, string> = {
       'ats_optimization': 'ATS optimization completed',
@@ -115,7 +115,7 @@ export class ProcessingLogger extends BaseLogger {
 
   /**
    * Log AI service API calls
-   */
+    */
   aiServiceCalled(context: {
     service?: string;
     endpoint?: string;
@@ -143,7 +143,7 @@ export class ProcessingLogger extends BaseLogger {
 
   /**
    * Log retry attempts
-   */
+    */
   retryAttempt(context: {
     cvId?: string;
     feature?: string;
@@ -171,21 +171,21 @@ export class ProcessingLogger extends BaseLogger {
 
   /**
    * Execute callback with correlation ID context
-   */
+    */
   withCorrelation(correlationId: string, callback: () => string): string {
     return super.withCorrelation(correlationId, callback);
   }
 
   /**
    * Get last log entry (for testing)
-   */
+    */
   getLastLogEntry() {
     return super.getLastLogEntry();
   }
 
   /**
    * Get all log entries (for testing)
-   */
+    */
   getAllLogEntries() {
     return super.getAllLogEntries();
   }

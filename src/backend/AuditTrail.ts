@@ -3,7 +3,7 @@
  *
  * Implements comprehensive audit logging for compliance (GDPR, SOX, HIPAA)
  * Provides immutable audit logs with integrity verification and retention policies
- */
+  */
 
 import { EventEmitter } from 'events';
 import { createHash, createHmac } from 'crypto';
@@ -11,7 +11,7 @@ import { LogEntry, AuditTrail as IAuditTrail, AuditAction, AlertSeverity } from 
 
 /**
  * Audit event types based on common compliance frameworks
- */
+  */
 export enum AuditEventType {
   // Authentication & Authorization
   USER_LOGIN = 'user.login',
@@ -58,96 +58,96 @@ export enum AuditEventType {
 
 /**
  * Audit entry structure
- */
+  */
 export interface AuditEntry {
   /**
    * Unique audit entry ID
-   */
+    */
   id: string;
 
   /**
    * Timestamp of the event
-   */
+    */
   timestamp: Date;
 
   /**
    * Type of audit event
-   */
+    */
   eventType: AuditEventType;
 
   /**
    * Severity level
-   */
+    */
   severity: AlertSeverity;
 
   /**
    * User who performed the action
-   */
+    */
   userId?: string;
 
   /**
    * User's email or identifier
-   */
+    */
   userEmail?: string;
 
   /**
    * Session ID
-   */
+    */
   sessionId?: string;
 
   /**
    * IP address of the user
-   */
+    */
   ipAddress?: string;
 
   /**
    * User agent string
-   */
+    */
   userAgent?: string;
 
   /**
    * Resource that was affected
-   */
+    */
   resource?: string;
 
   /**
    * Resource ID
-   */
+    */
   resourceId?: string;
 
   /**
    * Action performed
-   */
+    */
   action: AuditAction;
 
   /**
    * Result of the action
-   */
+    */
   result: 'SUCCESS' | 'FAILURE' | 'PARTIAL';
 
   /**
    * Detailed description
-   */
+    */
   description: string;
 
   /**
    * Additional context data
-   */
+    */
   context: Record<string, any>;
 
   /**
    * Original request data (if applicable)
-   */
+    */
   requestData?: Record<string, any>;
 
   /**
    * Response data (if applicable)
-   */
+    */
   responseData?: Record<string, any>;
 
   /**
    * Error information (if result is FAILURE)
-   */
+    */
   error?: {
     code: string;
     message: string;
@@ -156,7 +156,7 @@ export interface AuditEntry {
 
   /**
    * Geographic location (if available)
-   */
+    */
   location?: {
     country?: string;
     region?: string;
@@ -169,98 +169,98 @@ export interface AuditEntry {
 
   /**
    * Compliance tags for regulation mapping
-   */
+    */
   complianceTags: string[];
 
   /**
    * Data hash for integrity verification
-   */
+    */
   hash: string;
 
   /**
    * Previous entry hash for chain verification
-   */
+    */
   previousHash?: string;
 }
 
 /**
  * Retention policy configuration
- */
+  */
 export interface RetentionPolicy {
   /**
    * Retention period in days
-   */
+    */
   retentionDays: number;
 
   /**
    * Archive after days (move to long-term storage)
-   */
+    */
   archiveAfterDays?: number;
 
   /**
    * Compress old entries
-   */
+    */
   compress?: boolean;
 
   /**
    * Event types this policy applies to
-   */
+    */
   eventTypes?: AuditEventType[];
 
   /**
    * Severity levels this policy applies to
-   */
+    */
   severities?: AlertSeverity[];
 }
 
 /**
  * Audit trail configuration
- */
+  */
 export interface AuditTrailConfig {
   /**
    * Unique identifier for the audit trail
-   */
+    */
   id?: string;
 
   /**
    * Enable audit trail
-   */
+    */
   enabled: boolean;
 
   /**
    * Secret key for hash generation
-   */
+    */
   secretKey: string;
 
   /**
    * Hash algorithm
-   */
+    */
   hashAlgorithm: 'sha256' | 'sha512';
 
   /**
    * Maximum entries to keep in memory
-   */
+    */
   maxMemoryEntries: number;
 
   /**
    * Retention policies
-   */
+    */
   retentionPolicies: RetentionPolicy[];
 
   /**
    * Enable integrity verification
-   */
+    */
   enableIntegrityVerification: boolean;
 
   /**
    * Auto-archive old entries
-   */
+    */
   autoArchive: boolean;
 }
 
 /**
  * Audit trail statistics
- */
+  */
 export interface AuditTrailStats {
   totalEntries: number;
   entriesByType: Record<AuditEventType, number>;
@@ -276,7 +276,7 @@ export interface AuditTrailStats {
 
 /**
  * Audit trail implementation
- */
+  */
 export class AuditTrail extends EventEmitter implements IAuditTrail {
   // IAuditTrail interface properties
   public readonly id: string;
@@ -329,7 +329,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
 
   /**
    * Log an audit event
-   */
+    */
   logEvent(
     eventType: AuditEventType,
     action: AuditAction,
@@ -394,7 +394,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
 
   /**
    * Log from regular log entry
-   */
+    */
   logFromEntry(logEntry: LogEntry, auditMapping?: {
     eventType?: AuditEventType;
     action?: AuditAction;
@@ -421,7 +421,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
 
   /**
    * Add entry to trail
-   */
+    */
   private addEntry(entry: AuditEntry): void {
     this.entries.push(entry);
 
@@ -442,7 +442,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
 
   /**
    * Update statistics
-   */
+    */
   private updateStats(entry: AuditEntry): void {
     this.stats.totalEntries++;
     this.stats.entriesByType[entry.eventType]++;
@@ -468,14 +468,14 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
 
   /**
    * Generate unique ID for audit entry
-   */
+    */
   private generateId(): string {
     return `audit_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
   }
 
   /**
    * Generate hash for entry integrity
-   */
+    */
   private generateEntryHash(entry: AuditEntry): string {
     const dataToHash = {
       id: entry.id,
@@ -498,7 +498,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
 
   /**
    * Infer audit event type from log entry
-   */
+    */
   private inferEventType(logEntry: LogEntry): AuditEventType {
     const message = logEntry.message.toLowerCase();
 
@@ -516,7 +516,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
 
   /**
    * Map log level to audit severity
-   */
+    */
   private mapLogLevelToAlertSeverity(level: string): AlertSeverity {
     switch (level.toLowerCase()) {
       case 'debug':
@@ -536,7 +536,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
 
   /**
    * Apply retention policies
-   */
+    */
   private applyRetentionPolicies(): void {
     if (!this.config.autoArchive) return;
 
@@ -570,7 +570,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
 
   /**
    * Query audit entries
-   */
+    */
   query(filters: {
     eventTypes?: AuditEventType[];
     severities?: AlertSeverity[];
@@ -635,7 +635,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
 
   /**
    * Verify audit trail integrity
-   */
+    */
   verifyIntegrity(): {
     isValid: boolean;
     invalidEntries: Array<{ entry: AuditEntry; reason: string }>;
@@ -686,14 +686,14 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
 
   /**
    * Get statistics
-   */
+    */
   getStats(): AuditTrailStats {
     return { ...this.stats };
   }
 
   /**
    * Export audit trail for compliance reporting
-   */
+    */
   exportForCompliance(format: 'json' | 'csv' = 'json'): string {
     const exportData = {
       exportTimestamp: new Date().toISOString(),
@@ -731,7 +731,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
 
   /**
    * Clear all entries (use with caution!)
-   */
+    */
   clearAll(): number {
     const count = this.entries.length;
     this.entries.length = 0;
@@ -759,7 +759,7 @@ export class AuditTrail extends EventEmitter implements IAuditTrail {
 
 /**
  * Global audit trail instance
- */
+  */
 export const globalAuditTrail = new AuditTrail({
   enabled: process.env.AUDIT_ENABLED !== 'false',
   secretKey: process.env.AUDIT_SECRET_KEY || 'default-secret-key',

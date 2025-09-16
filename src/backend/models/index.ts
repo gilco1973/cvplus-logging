@@ -1,6 +1,6 @@
 /**
  * Models index - Export all logging data models
- */
+  */
 
 import { LogEntry } from './LogEntry';
 

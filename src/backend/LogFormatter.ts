@@ -3,14 +3,14 @@
  *
  * Formats log entries for different outputs (console, file, Firebase Cloud Logging)
  * Provides consistent structured formatting across all CVPlus packages
- */
+  */
 
 import { LogLevel, PerformanceInfo, LogDomain } from './types/index';
 import { LogEntry, FormattedLogEntry, FirebaseLogEntry } from './types';
 
 /**
  * Color codes for console output
- */
+  */
 const CONSOLE_COLORS = {
   reset: '\x1b[0m',
   bright: '\x1b[1m',
@@ -26,7 +26,7 @@ const CONSOLE_COLORS = {
 
 /**
  * Log level to color mapping for console output
- */
+  */
 const LEVEL_COLORS: Record<LogLevel, string> = {
   [LogLevel.DEBUG]: CONSOLE_COLORS.cyan,
   [LogLevel.INFO]: CONSOLE_COLORS.green,
@@ -37,7 +37,7 @@ const LEVEL_COLORS: Record<LogLevel, string> = {
 
 /**
  * Log level to Firebase severity mapping
- */
+  */
 const FIREBASE_SEVERITY_MAP: Record<LogLevel, string> = {
   [LogLevel.DEBUG]: 'DEBUG',
   [LogLevel.INFO]: 'INFO',
@@ -48,11 +48,11 @@ const FIREBASE_SEVERITY_MAP: Record<LogLevel, string> = {
 
 /**
  * Log formatting service for different output targets
- */
+  */
 export class LogFormatter {
   /**
    * Format log entry to common structured format
-   */
+    */
   static formatLogEntry(logEntry: LogEntry): FormattedLogEntry {
     const formatted: FormattedLogEntry = {
       '@timestamp': logEntry.timestamp,
@@ -90,7 +90,7 @@ export class LogFormatter {
 
   /**
    * Format log entry for console output with colors and readable layout
-   */
+    */
   static formatForConsole(logEntry: LogEntry): string {
     const timestamp = logEntry.timestamp;
     const level = logEntry.level.toUpperCase();
@@ -131,7 +131,7 @@ export class LogFormatter {
 
   /**
    * Format log entry for file output as JSON
-   */
+    */
   static formatForFile(logEntry: LogEntry): string {
     const formatted = this.formatLogEntry(logEntry);
     return JSON.stringify(formatted);
@@ -139,7 +139,7 @@ export class LogFormatter {
 
   /**
    * Format log entry for Firebase Cloud Logging
-   */
+    */
   static formatForFirebase(logEntry: LogEntry): FirebaseLogEntry {
     const firebaseEntry: FirebaseLogEntry = {
       timestamp: logEntry.timestamp,
@@ -198,7 +198,7 @@ export class LogFormatter {
 
   /**
    * Sanitize log message by removing control characters and limiting length
-   */
+    */
   static sanitizeMessage(message: string, maxLength: number = 5000): string {
     if (!message || typeof message !== 'string') {
       return String(message || '');
@@ -223,7 +223,7 @@ export class LogFormatter {
 
   /**
    * Format context object for console display
-   */
+    */
   private static formatContextForConsole(context: Record<string, unknown>): string {
     const parts: string[] = [];
 
@@ -246,7 +246,7 @@ export class LogFormatter {
 
   /**
    * Format performance metrics for console display
-   */
+    */
   private static formatPerformanceForConsole(performance: PerformanceInfo): string {
     const parts: string[] = [];
 
@@ -275,7 +275,7 @@ export class LogFormatter {
 
   /**
    * Create a structured log template for specific domains
-   */
+    */
   static createTemplate(domain: string): {
     format: (message: string, context?: Record<string, unknown>) => Partial<LogEntry>;
   } {
@@ -293,7 +293,7 @@ export class LogFormatter {
 
   /**
    * Batch format multiple log entries for efficient processing
-   */
+    */
   static formatBatch(
     entries: LogEntry[],
     format: 'console' | 'file' | 'firebase' = 'file'
@@ -314,7 +314,7 @@ export class LogFormatter {
 
   /**
    * Validate log entry format
-   */
+    */
   static validateLogEntry(logEntry: any): logEntry is LogEntry {
     return (
       logEntry &&

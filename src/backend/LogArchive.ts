@@ -3,7 +3,7 @@
  *
  * Manages long-term log storage, compression, and retrieval
  * Provides efficient archival strategies for compliance and cost optimization
- */
+  */
 
 import { EventEmitter } from 'events';
 import { createGzip, createGunzip } from 'zlib';
@@ -12,7 +12,7 @@ import { LogEntry, LogLevel, LogDomain } from './types/index';
 
 /**
  * Archive storage types
- */
+  */
 export enum ArchiveStorageType {
   FILESYSTEM = 'filesystem',
   CLOUD_STORAGE = 'cloud_storage',
@@ -23,7 +23,7 @@ export enum ArchiveStorageType {
 
 /**
  * Archive compression types
- */
+  */
 export enum CompressionType {
   NONE = 'none',
   GZIP = 'gzip',
@@ -32,176 +32,176 @@ export enum CompressionType {
 
 /**
  * Archive policy configuration
- */
+  */
 export interface ArchivePolicy {
   /**
    * Policy ID
-   */
+    */
   id: string;
 
   /**
    * Policy name
-   */
+    */
   name: string;
 
   /**
    * Days after which logs should be archived
-   */
+    */
   archiveAfterDays: number;
 
   /**
    * Days after which logs should be deleted (0 = never delete)
-   */
+    */
   deleteAfterDays: number;
 
   /**
    * Compression type
-   */
+    */
   compression: CompressionType;
 
   /**
    * Storage destination
-   */
+    */
   storageType: ArchiveStorageType;
 
   /**
    * Storage configuration
-   */
+    */
   storageConfig: Record<string, any>;
 
   /**
    * Log levels to archive
-   */
+    */
   levels?: LogLevel[];
 
   /**
    * Log domains to archive
-   */
+    */
   domains?: LogDomain[];
 
   /**
    * Packages to archive
-   */
+    */
   packages?: string[];
 
   /**
    * Batch size for archival operations
-   */
+    */
   batchSize: number;
 
   /**
    * Enable deduplication
-   */
+    */
   deduplicate: boolean;
 
   /**
    * Archive metadata retention
-   */
+    */
   retainMetadata: boolean;
 }
 
 /**
  * Archive metadata
- */
+  */
 export interface ArchiveMetadata {
   /**
    * Archive ID
-   */
+    */
   id: string;
 
   /**
    * Archive creation timestamp
-   */
+    */
   createdAt: Date;
 
   /**
    * Start time of archived logs
-   */
+    */
   startTime: Date;
 
   /**
    * End time of archived logs
-   */
+    */
   endTime: Date;
 
   /**
    * Number of entries in archive
-   */
+    */
   entryCount: number;
 
   /**
    * Original size in bytes
-   */
+    */
   originalSizeBytes: number;
 
   /**
    * Compressed size in bytes
-   */
+    */
   compressedSizeBytes: number;
 
   /**
    * Compression ratio
-   */
+    */
   compressionRatio: number;
 
   /**
    * Storage type used
-   */
+    */
   storageType: ArchiveStorageType;
 
   /**
    * Storage path or identifier
-   */
+    */
   storagePath: string;
 
   /**
    * Compression type used
-   */
+    */
   compressionType: CompressionType;
 
   /**
    * Policy used for archival
-   */
+    */
   policyId: string;
 
   /**
    * Log levels included
-   */
+    */
   levels: LogLevel[];
 
   /**
    * Log domains included
-   */
+    */
   domains: LogDomain[];
 
   /**
    * Packages included
-   */
+    */
   packages: string[];
 
   /**
    * Checksum for integrity verification
-   */
+    */
   checksum: string;
 
   /**
    * Tags for categorization
-   */
+    */
   tags: string[];
 
   /**
    * Custom metadata
-   */
+    */
   customMetadata: Record<string, any>;
 }
 
 /**
  * Archive query filters
- */
+  */
 export interface ArchiveQuery {
   /**
    * Date range
-   */
+    */
   dateRange?: {
     start: Date;
     end: Date;
@@ -209,48 +209,48 @@ export interface ArchiveQuery {
 
   /**
    * Log levels
-   */
+    */
   levels?: LogLevel[];
 
   /**
    * Log domains
-   */
+    */
   domains?: LogDomain[];
 
   /**
    * Packages
-   */
+    */
   packages?: string[];
 
   /**
    * User IDs
-   */
+    */
   userIds?: string[];
 
   /**
    * Message pattern
-   */
+    */
   messagePattern?: RegExp;
 
   /**
    * Tags
-   */
+    */
   tags?: string[];
 
   /**
    * Maximum results
-   */
+    */
   limit?: number;
 
   /**
    * Result offset
-   */
+    */
   offset?: number;
 }
 
 /**
  * Archive statistics
- */
+  */
 export interface ArchiveStats {
   totalArchives: number;
   totalEntriesArchived: number;
@@ -266,7 +266,7 @@ export interface ArchiveStats {
 
 /**
  * Log archive system
- */
+  */
 export class LogArchive extends EventEmitter {
   private readonly policies: Map<string, ArchivePolicy> = new Map();
   private readonly archives: Map<string, ArchiveMetadata> = new Map();
@@ -298,7 +298,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Add archive policy
-   */
+    */
   addPolicy(policy: ArchivePolicy): void {
     this.policies.set(policy.id, policy);
     this.emit('policy-added', policy);
@@ -306,7 +306,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Remove archive policy
-   */
+    */
   removePolicy(policyId: string): boolean {
     const success = this.policies.delete(policyId);
     if (success) {
@@ -317,14 +317,14 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Get archive policy
-   */
+    */
   getPolicy(policyId: string): ArchivePolicy | undefined {
     return this.policies.get(policyId);
   }
 
   /**
    * Archive log entries based on policies
-   */
+    */
   async archiveEntries(
     entries: LogEntry[],
     policyId?: string
@@ -363,7 +363,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Filter entries based on policy criteria
-   */
+    */
   private filterEntriesForPolicy(entries: LogEntry[], policy: ArchivePolicy): LogEntry[] {
     return entries.filter(entry => {
       const entryAge = Date.now() - new Date(entry.timestamp).getTime();
@@ -391,7 +391,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Create batches of entries for archival
-   */
+    */
   private createBatches(entries: LogEntry[], batchSize: number): LogEntry[][] {
     const batches: LogEntry[][] = [];
 
@@ -404,7 +404,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Create archive from batch of entries
-   */
+    */
   private async createArchive(
     entries: LogEntry[],
     policy: ArchivePolicy
@@ -477,7 +477,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Deduplicate entries
-   */
+    */
   private deduplicateEntries(entries: LogEntry[]): LogEntry[] {
     const seen = new Set<string>();
     return entries.filter(entry => {
@@ -492,7 +492,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Compress data based on compression type
-   */
+    */
   private async compressData(
     data: string,
     compressionType: CompressionType
@@ -531,7 +531,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Store archive data
-   */
+    */
   private async storeArchive(
     data: Buffer,
     archiveId: string,
@@ -575,7 +575,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Retrieve archived entries
-   */
+    */
   async retrieveArchive(
     archiveId: string,
     query?: ArchiveQuery
@@ -612,7 +612,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Retrieve archive data from storage
-   */
+    */
   private async retrieveArchiveData(
     storagePath: string,
     storageType: ArchiveStorageType
@@ -639,7 +639,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Decompress data
-   */
+    */
   private async decompressData(
     data: Buffer,
     compressionType: CompressionType
@@ -667,7 +667,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Filter entries by query
-   */
+    */
   private filterEntriesByQuery(entries: LogEntry[], query: ArchiveQuery): LogEntry[] {
     let filtered = [...entries];
 
@@ -710,7 +710,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Search across multiple archives
-   */
+    */
   async searchArchives(query: ArchiveQuery): Promise<{
     entries: LogEntry[];
     archivesSearched: number;
@@ -746,7 +746,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Find archives relevant to query
-   */
+    */
   private findRelevantArchives(query: ArchiveQuery): ArchiveMetadata[] {
     return Array.from(this.archives.values()).filter(archive => {
       // Date range filter
@@ -781,7 +781,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Delete old archives based on policies
-   */
+    */
   async cleanupArchives(): Promise<{
     deletedArchives: string[];
     freedSpaceBytes: number;
@@ -812,7 +812,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Delete archive
-   */
+    */
   async deleteArchive(archiveId: string): Promise<boolean> {
     const metadata = this.archives.get(archiveId);
     if (!metadata) {
@@ -844,7 +844,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Delete archive from storage
-   */
+    */
   private async deleteArchiveFromStorage(
     storagePath: string,
     storageType: ArchiveStorageType
@@ -855,7 +855,7 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Utility methods
-   */
+    */
   private generateArchiveId(): string {
     return `archive_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
   }
@@ -893,21 +893,21 @@ export class LogArchive extends EventEmitter {
 
   /**
    * Get archive statistics
-   */
+    */
   getStats(): ArchiveStats {
     return { ...this.stats };
   }
 
   /**
    * Get all archive metadata
-   */
+    */
   getAllArchives(): ArchiveMetadata[] {
     return Array.from(this.archives.values());
   }
 
   /**
    * Export archive catalog
-   */
+    */
   exportCatalog(): string {
     return JSON.stringify({
       exportTime: new Date().toISOString(),
@@ -920,5 +920,5 @@ export class LogArchive extends EventEmitter {
 
 /**
  * Global log archive instance
- */
+  */
 export const globalLogArchive = new LogArchive();

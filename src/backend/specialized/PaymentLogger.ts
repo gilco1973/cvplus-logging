@@ -1,7 +1,7 @@
 /**
  * T025: Payment-specific logging implementation
  * CVPlus Logging System - Payment Module Logger
- */
+  */
 
 import { BaseLogger } from '../core/BaseLogger';
 import { LogLevel, LogDomain } from '../types';
@@ -16,7 +16,7 @@ export class PaymentLogger extends BaseLogger {
 
   /**
    * Log payment initiation
-   */
+    */
   paymentInitiated(context: {
     userId?: string;
     transactionId?: string;
@@ -42,7 +42,7 @@ export class PaymentLogger extends BaseLogger {
 
   /**
    * Log successful payment
-   */
+    */
   paymentSucceeded(context: {
     transactionId?: string;
     userId?: string;
@@ -77,7 +77,7 @@ export class PaymentLogger extends BaseLogger {
 
   /**
    * Log payment failures
-   */
+    */
   paymentFailed(context: {
     transactionId?: string;
     userId?: string;
@@ -121,7 +121,7 @@ export class PaymentLogger extends BaseLogger {
 
   /**
    * Log subscription creation
-   */
+    */
   subscriptionCreated(context: {
     userId?: string;
     subscriptionId?: string;
@@ -151,7 +151,7 @@ export class PaymentLogger extends BaseLogger {
 
   /**
    * Log invoice generation
-   */
+    */
   invoiceGenerated(context: {
     invoiceId?: string;
     userId?: string;
@@ -180,7 +180,7 @@ export class PaymentLogger extends BaseLogger {
 
   /**
    * Log payment retry scheduling
-   */
+    */
   paymentRetryScheduled(context: {
     transactionId?: string;
     userId?: string;
@@ -215,7 +215,7 @@ export class PaymentLogger extends BaseLogger {
 
   /**
    * Log suspicious payment activity
-   */
+    */
   suspiciousPaymentActivity(context: {
     userId?: string;
     transactionId?: string;
@@ -243,7 +243,7 @@ export class PaymentLogger extends BaseLogger {
 
   /**
    * Log chargeback events
-   */
+    */
   chargebackReceived(context: {
     chargeId?: string;
     transactionId?: string;
@@ -273,7 +273,7 @@ export class PaymentLogger extends BaseLogger {
 
   /**
    * Log payment performance metrics
-   */
+    */
   paymentPerformance(context: {
     processingTimeMs?: number;
     paymentMethod?: string;
@@ -300,14 +300,14 @@ export class PaymentLogger extends BaseLogger {
 
   /**
    * Get last log entry (for testing)
-   */
+    */
   getLastLogEntry() {
     return super.getLastLogEntry();
   }
 
   /**
    * Get all log entries (for testing)
-   */
+    */
   getAllLogEntries() {
     return super.getAllLogEntries();
   }

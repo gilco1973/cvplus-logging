@@ -1,7 +1,7 @@
 /**
  * T021: Base logger implementation with Winston integration
  * CVPlus Logging System - Core Logger Implementation
- */
+  */
 
 import winston, { Logger as WinstonLogger } from 'winston';
 import {
@@ -33,7 +33,7 @@ export class BaseLogger implements ILogger {
 
   /**
    * Create and configure Winston logger
-   */
+    */
   private createWinstonLogger(): WinstonLogger {
     const transports: winston.transport[] = [];
 
@@ -87,7 +87,7 @@ export class BaseLogger implements ILogger {
 
   /**
    * Generate unique log ID
-   */
+    */
   private generateLogId(): string {
     const timestamp = Date.now();
     return `${this.config.service}-${timestamp}-${Math.random().toString(36).substr(2, 9)}`;
@@ -95,7 +95,7 @@ export class BaseLogger implements ILogger {
 
   /**
    * Get contextual metadata
-   */
+    */
   private getContextualMetadata(): Record<string, any> {
     return {
       ...this.config.metadata || {},
@@ -105,21 +105,21 @@ export class BaseLogger implements ILogger {
 
   /**
    * Set context for this logger instance
-   */
+    */
   setContext(context: Record<string, any>): void {
     this.contextOverrides = { ...this.contextOverrides, ...context };
   }
 
   /**
    * Clear all context overrides
-   */
+    */
   clearContext(): void {
     this.contextOverrides = {};
   }
 
   /**
    * Core logging implementation
-   */
+    */
   log(level: LogLevel, message: string, context: Record<string, any> = {}, error?: Error): string {
     const correlationId = getCurrentCorrelationId() || generateCorrelationId();
     const timestamp = Date.now();
@@ -176,35 +176,35 @@ export class BaseLogger implements ILogger {
 
   /**
    * Error level logging
-   */
+    */
   error(message: string, context: Record<string, any> = {}, error?: Error): string {
     return this.log(LogLevel.ERROR, message, context, error);
   }
 
   /**
    * Warning level logging
-   */
+    */
   warn(message: string, context: Record<string, any> = {}): string {
     return this.log(LogLevel.WARN, message, context);
   }
 
   /**
    * Info level logging
-   */
+    */
   info(message: string, context: Record<string, any> = {}): string {
     return this.log(LogLevel.INFO, message, context);
   }
 
   /**
    * Debug level logging
-   */
+    */
   debug(message: string, context: Record<string, any> = {}): string {
     return this.log(LogLevel.DEBUG, message, context);
   }
 
   /**
    * Create logger with additional context
-   */
+    */
   withContext(context: Record<string, any>): ILogger {
     const newLogger = new BaseLogger(this.config.service, this.config);
     newLogger.contextOverrides = { ...this.contextOverrides, ...context };
@@ -214,21 +214,21 @@ export class BaseLogger implements ILogger {
 
   /**
    * Execute callback with correlation ID
-   */
+    */
   withCorrelation(correlationId: string, callback: () => string): string {
     return correlationManager.withCorrelation(correlationId, callback);
   }
 
   /**
    * Set user context for all subsequent logs
-   */
+    */
   setUserContext(userContext: UserContext): void {
     this.userContext = { ...this.userContext, ...userContext };
   }
 
   /**
    * Log performance metrics
-   */
+    */
   performanceMetric(metric: string, value: number, context: Record<string, any> = {}): string {
     const perfContext = {
       ...context,
@@ -242,7 +242,7 @@ export class BaseLogger implements ILogger {
 
   /**
    * Log business events
-   */
+    */
   businessEvent(event: string, context: Record<string, any> = {}): string {
     const businessContext = {
       ...context,
@@ -255,7 +255,7 @@ export class BaseLogger implements ILogger {
 
   /**
    * Log security events
-   */
+    */
   securityEvent(event: string, context: Record<string, any> = {}): string {
     const securityContext = {
       ...context,
@@ -268,7 +268,7 @@ export class BaseLogger implements ILogger {
 
   /**
    * Log audit events
-   */
+    */
   auditEvent(event: string, context: Record<string, any> = {}): string {
     const auditContext = {
       ...context,
@@ -281,28 +281,28 @@ export class BaseLogger implements ILogger {
 
   /**
    * Get last log entry
-   */
+    */
   getLastLogEntry(): LogEntry | null {
     return this.logEntries.length > 0 ? this.logEntries[this.logEntries.length - 1] : null;
   }
 
   /**
    * Get all stored log entries
-   */
+    */
   getAllLogEntries(): LogEntry[] {
     return [...this.logEntries];
   }
 
   /**
    * Clear stored log entries
-   */
+    */
   clearEntries(): void {
     this.logEntries = [];
   }
 
   /**
    * Store log entry with size management
-   */
+    */
   private storeLogEntry(entry: LogEntry): void {
     this.logEntries.push(entry);
 
@@ -314,7 +314,7 @@ export class BaseLogger implements ILogger {
 
   /**
    * Build user context for logging
-   */
+    */
   private buildUserContext(): Record<string, any> {
     const context: Record<string, any> = {};
 
@@ -342,7 +342,7 @@ export class BaseLogger implements ILogger {
 
   /**
    * Update logger configuration
-   */
+    */
   updateConfig(newConfig: Partial<LoggerConfig>): void {
     this.config = { ...this.config, ...newConfig };
     this.winston.configure({
@@ -353,7 +353,7 @@ export class BaseLogger implements ILogger {
 
   /**
    * Set log level
-   */
+    */
   setLevel(level: LogLevel): void {
     this.config.level = level;
     this.winston.level = level;
@@ -361,7 +361,7 @@ export class BaseLogger implements ILogger {
 
   /**
    * Check if level is enabled
-   */
+    */
   isLevelEnabled(level: LogLevel): boolean {
     const levels = {
       [LogLevel.ERROR]: 0,
@@ -377,7 +377,7 @@ export class BaseLogger implements ILogger {
 
   /**
    * Destroy logger and clean up resources
-   */
+    */
   destroy(): void {
     this.winston.destroy();
     this.logEntries = [];

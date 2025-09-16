@@ -1,7 +1,7 @@
 /**
  * T025: Multimedia-specific logging implementation
  * CVPlus Logging System - Multimedia Module Logger
- */
+  */
 
 import { BaseLogger } from '../core/BaseLogger';
 import { LogLevel, LogDomain } from '../types';
@@ -16,7 +16,7 @@ export class MultimediaLogger extends BaseLogger {
 
   /**
    * Log media upload started
-   */
+    */
   mediaUploadStarted(context: {
     userId?: string;
     fileName?: string;
@@ -40,7 +40,7 @@ export class MultimediaLogger extends BaseLogger {
 
   /**
    * Log video generation started
-   */
+    */
   videoGenerationStarted(context: {
     userId?: string;
     videoType?: string;
@@ -65,7 +65,7 @@ export class MultimediaLogger extends BaseLogger {
 
   /**
    * Log audio processing completed
-   */
+    */
   audioProcessingCompleted(context: {
     audioId?: string;
     processingType?: string;
@@ -91,7 +91,7 @@ export class MultimediaLogger extends BaseLogger {
 
   /**
    * Log media storage operations
-   */
+    */
   storageOperation(context: {
     operation?: string;
     bucketName?: string;
@@ -114,7 +114,7 @@ export class MultimediaLogger extends BaseLogger {
 
   /**
    * Log AI service calls with costs
-   */
+    */
   aiServiceCalled(context: {
     service?: string;
     endpoint?: string;
@@ -146,7 +146,7 @@ export class MultimediaLogger extends BaseLogger {
 
   /**
    * Log processing failures
-   */
+    */
   processingFailed(context: {
     mediaId?: string;
     processingType?: string;
@@ -183,7 +183,7 @@ export class MultimediaLogger extends BaseLogger {
 
   /**
    * Log processing completion with performance metrics
-   */
+    */
   processingCompleted(context: {
     mediaId?: string;
     processingDuration?: number;
@@ -209,7 +209,7 @@ export class MultimediaLogger extends BaseLogger {
 
   /**
    * Log storage quota warnings
-   */
+    */
   quotaWarning(context: {
     userId?: string;
     currentUsage?: number;
@@ -230,14 +230,14 @@ export class MultimediaLogger extends BaseLogger {
 
   /**
    * Get last log entry (for testing)
-   */
+    */
   getLastLogEntry() {
     return super.getLastLogEntry();
   }
 
   /**
    * Get all log entries (for testing)
-   */
+    */
   getAllLogEntries() {
     return super.getAllLogEntries();
   }

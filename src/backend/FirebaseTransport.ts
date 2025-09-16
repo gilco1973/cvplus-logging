@@ -3,7 +3,7 @@
  *
  * Custom Winston transport for Firebase Cloud Logging integration
  * Provides structured logging compatible with Google Cloud Logging standards
- */
+  */
 
 import winston from 'winston';
 import Transport from 'winston-transport';
@@ -12,7 +12,7 @@ import { LogFormatter } from './LogFormatter';
 
 /**
  * Firebase Cloud Logging severity mapping
- */
+  */
 const FIREBASE_SEVERITY_MAP: Record<LogLevel, string> = {
   [LogLevel.DEBUG]: 'DEBUG',
   [LogLevel.INFO]: 'INFO',
@@ -23,53 +23,53 @@ const FIREBASE_SEVERITY_MAP: Record<LogLevel, string> = {
 
 /**
  * Firebase Transport configuration options
- */
+  */
 export interface FirebaseTransportOptions {
   level?: string;
   /**
    * Google Cloud Project ID
-   */
+    */
   projectId?: string;
 
   /**
    * Cloud Function name for resource metadata
-   */
+    */
   functionName?: string;
 
   /**
    * Cloud Function region
-   */
+    */
   region?: string;
 
   /**
    * Maximum batch size for log entries
-   */
+    */
   batchSize?: number;
 
   /**
    * Batch flush interval in milliseconds
-   */
+    */
   flushInterval?: number;
 
   /**
    * Enable structured logging format
-   */
+    */
   structured?: boolean;
 
   /**
    * Additional resource labels
-   */
+    */
   resourceLabels?: Record<string, string>;
 
   /**
    * Custom log name prefix
-   */
+    */
   logName?: string;
 }
 
 /**
  * Firebase Cloud Logging transport for Winston
- */
+  */
 export class FirebaseTransport extends Transport {
   private readonly options: FirebaseTransportOptions;
   private readonly logBatch: FirebaseLogEntry[] = [];
@@ -99,7 +99,7 @@ export class FirebaseTransport extends Transport {
 
   /**
    * Winston log method - called for each log entry
-   */
+    */
   log(info: any, callback: () => void): void {
     setImmediate(() => {
       this.emit('logged', info);
@@ -120,7 +120,7 @@ export class FirebaseTransport extends Transport {
 
   /**
    * Transform Winston info object to CVPlus LogEntry
-   */
+    */
   private transformToLogEntry(info: any): LogEntry {
     const level = this.mapWinstonLevel(info.level);
 
@@ -146,7 +146,7 @@ export class FirebaseTransport extends Transport {
 
   /**
    * Map Winston log levels to CVPlus LogLevel enum
-   */
+    */
   private mapWinstonLevel(winstonLevel: string): LogLevel {
     switch (winstonLevel.toLowerCase()) {
       case 'debug':
@@ -169,7 +169,7 @@ export class FirebaseTransport extends Transport {
 
   /**
    * Add log entry to batch for efficient processing
-   */
+    */
   private addToBatch(entry: FirebaseLogEntry): void {
     this.logBatch.push(entry);
 
@@ -189,7 +189,7 @@ export class FirebaseTransport extends Transport {
 
   /**
    * Flush batch to Firebase Cloud Logging
-   */
+    */
   private flush(): void {
     if (this.logBatch.length === 0) {
       return;
@@ -218,7 +218,7 @@ export class FirebaseTransport extends Transport {
 
   /**
    * Process batch of log entries to Firebase
-   */
+    */
   private async processBatch(entries: FirebaseLogEntry[]): Promise<void> {
     if (entries.length === 0) {
       return;
@@ -244,7 +244,7 @@ export class FirebaseTransport extends Transport {
 
   /**
    * Generate correlation ID if none provided
-   */
+    */
   private generateCorrelationId(): string {
     return Math.random().toString(36).substring(2, 15) +
            Math.random().toString(36).substring(2, 15);
@@ -252,7 +252,7 @@ export class FirebaseTransport extends Transport {
 
   /**
    * Close transport and flush remaining entries
-   */
+    */
   close(): void {
     if (this.batchTimeout) {
       clearTimeout(this.batchTimeout);
@@ -269,7 +269,7 @@ export class FirebaseTransport extends Transport {
 
   /**
    * Get transport statistics
-   */
+    */
   getStats(): {
     batchSize: number;
     pendingEntries: number;
@@ -286,7 +286,7 @@ export class FirebaseTransport extends Transport {
 
   /**
    * Force immediate flush of pending entries
-   */
+    */
   forceFlush(): Promise<void> {
     return new Promise((resolve) => {
       if (this.logBatch.length === 0) {
@@ -305,7 +305,7 @@ export class FirebaseTransport extends Transport {
 
   /**
    * Create Firebase transport with common configurations
-   */
+    */
   static createForEnvironment(environment: 'development' | 'production' = 'production'): FirebaseTransport {
     const isDevelopment = environment === 'development';
 
@@ -319,7 +319,7 @@ export class FirebaseTransport extends Transport {
 
   /**
    * Validate transport configuration
-   */
+    */
   static validateConfig(options: FirebaseTransportOptions): {
     isValid: boolean;
     errors: string[];
@@ -347,5 +347,5 @@ export class FirebaseTransport extends Transport {
 
 /**
  * Default export for convenient import
- */
+  */
 export default FirebaseTransport;

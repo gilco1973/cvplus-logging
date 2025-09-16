@@ -3,13 +3,13 @@
  *
  * Automatically detects and redacts personally identifiable information (PII)
  * from log entries to ensure GDPR and privacy compliance
- */
+  */
 
 import { LogEntry, PiiRedactionConfig } from './types';
 
 /**
  * Default PII patterns for automatic detection and redaction
- */
+  */
 const DEFAULT_PII_PATTERNS: Record<string, RegExp> = {
   // Email addresses
   email: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
@@ -45,7 +45,7 @@ const DEFAULT_PII_PATTERNS: Record<string, RegExp> = {
 
 /**
  * Redaction replacement functions
- */
+  */
 const REDACTION_REPLACEMENTS: Record<string, (match: string) => string> = {
   email: () => '[EMAIL_REDACTED]',
   phone: () => '[PHONE_REDACTED]',
@@ -65,7 +65,7 @@ const REDACTION_REPLACEMENTS: Record<string, (match: string) => string> = {
 
 /**
  * PII Redaction service for protecting sensitive information in logs
- */
+  */
 export class PiiRedaction {
   private static enabled: boolean = true;
   private static customPatterns: Record<string, RegExp> = {};
@@ -73,21 +73,21 @@ export class PiiRedaction {
 
   /**
    * Check if PII redaction is currently enabled
-   */
+    */
   static isEnabled(): boolean {
     return this.enabled;
   }
 
   /**
    * Enable or disable PII redaction globally
-   */
+    */
   static setEnabled(enabled: boolean): void {
     this.enabled = enabled;
   }
 
   /**
    * Add custom PII patterns for redaction
-   */
+    */
   static addCustomPattern(
     name: string,
     pattern: RegExp,
@@ -103,7 +103,7 @@ export class PiiRedaction {
 
   /**
    * Remove a custom PII pattern
-   */
+    */
   static removeCustomPattern(name: string): void {
     delete this.customPatterns[name];
     delete this.customReplacements[name];
@@ -111,7 +111,7 @@ export class PiiRedaction {
 
   /**
    * Redact PII from a string
-   */
+    */
   static redactString(
     text: string,
     customPatterns?: Record<string, RegExp>
@@ -147,7 +147,7 @@ export class PiiRedaction {
 
   /**
    * Recursively redact PII from an object
-   */
+    */
   static redactObject<T>(obj: T): T {
     if (!this.enabled || obj === null || obj === undefined) {
       return obj;
@@ -184,7 +184,7 @@ export class PiiRedaction {
 
   /**
    * Redact PII from a log entry
-   */
+    */
   static redactLogEntry(logEntry: LogEntry): LogEntry {
     if (!this.enabled) {
       return logEntry;
@@ -204,7 +204,7 @@ export class PiiRedaction {
 
   /**
    * Create a redaction configuration for specific use cases
-   */
+    */
   static createConfig(options: {
     enabled?: boolean;
     patterns?: Record<string, RegExp>;
@@ -232,7 +232,7 @@ export class PiiRedaction {
 
   /**
    * Validate that a string has been properly redacted
-   */
+    */
   static validateRedaction(text: string): {
     isClean: boolean;
     violations: Array<{ type: string; match: string; position: number }>;
@@ -259,7 +259,7 @@ export class PiiRedaction {
 
   /**
    * Get statistics about redaction operations
-   */
+    */
   static getRedactionStats(): {
     enabled: boolean;
     totalPatterns: number;
@@ -281,7 +281,7 @@ export class PiiRedaction {
 
   /**
    * Reset all custom patterns and settings
-   */
+    */
   static reset(): void {
     this.customPatterns = {};
     this.customReplacements = {};

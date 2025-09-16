@@ -4,7 +4,7 @@
  * Automated documentation generation for the CVPlus logging system.
  * Generates API documentation, configuration guides, usage examples,
  * and migration documentation from code annotations and configurations.
- */
+  */
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -77,7 +77,7 @@ class LoggingDocsGenerator {
 
   /**
    * Generate complete documentation
-   */
+    */
   async generateAll(): Promise<void> {
     console.log('🚀 Generating CVPlus Logging Documentation...');
 
@@ -111,7 +111,7 @@ class LoggingDocsGenerator {
 
   /**
    * Generate overview documentation
-   */
+    */
   private async generateOverview(): Promise<void> {
     const overview = `# CVPlus Logging System
 
@@ -254,7 +254,7 @@ For questions, issues, or contributions:
 
   /**
    * Generate quick start guide
-   */
+    */
   private async generateQuickStart(): Promise<void> {
     const quickStart = `# Quick Start Guide
 
@@ -626,7 +626,7 @@ Need help? Check our [Troubleshooting Guide](./troubleshooting.md) or contact su
 
   /**
    * Generate API documentation
-   */
+    */
   private async generateAPIDocumentation(): Promise<void> {
     const apiDocs = await this.extractAPIEndpoints();
 
@@ -823,7 +823,7 @@ curl -H "X-API-Key: your-api-key" \\
 
   /**
    * Extract API endpoints from source code
-   */
+    */
   private async extractAPIEndpoints(): Promise<APIEndpoint[]> {
     // This would typically parse the actual API route files
     // For now, return mock data based on what we've implemented
@@ -881,7 +881,7 @@ curl -H "X-API-Key: your-api-key" \\
 
   /**
    * Format API endpoint documentation
-   */
+    */
   private formatAPIEndpoint(endpoint: APIEndpoint): string {
     const paramTable = endpoint.parameters.length > 0 ? `
 **Parameters:**
@@ -920,7 +920,7 @@ ${paramTable}${responseTable}${examples}`;
 
   /**
    * Generate configuration documentation
-   */
+    */
   private async generateConfigurationGuide(): Promise<void> {
     const configGuide = `# Configuration Guide
 
@@ -1275,7 +1275,7 @@ For troubleshooting configuration issues, see the [Troubleshooting Guide](./trou
 
   /**
    * Generate migration guide
-   */
+    */
   private async generateMigrationGuide(): Promise<void> {
     const migrationGuide = `# Migration Guide
 
@@ -1648,7 +1648,7 @@ Need help with migration? Contact our migration support team.
 
   /**
    * Generate troubleshooting documentation
-   */
+    */
   private async generateTroubleshooting(): Promise<void> {
     const troubleshooting = `# Troubleshooting Guide
 
@@ -2063,7 +2063,7 @@ npm run logging:clear-cache
 
   /**
    * Generate examples documentation
-   */
+    */
   private async generateExamples(): Promise<void> {
     const examples = `# Examples
 
@@ -2758,7 +2758,7 @@ These examples demonstrate real-world usage patterns for the CVPlus Logging Syst
 
   /**
    * Generate architecture documentation
-   */
+    */
   private async generateArchitecture(): Promise<void> {
     const architecture = `# System Architecture
 

@@ -1,7 +1,7 @@
 /**
  * Advanced testing utilities for the CVPlus logging system
  * Provides comprehensive test helpers, mocks, and validation tools
- */
+  */
 
 import { EventEmitter } from 'events';
 import { LogLevel, LogMetadata, CorrelationContext } from '../backend/types/index';
@@ -9,7 +9,7 @@ import { LogEntry } from '../backend/models/LogEntry';
 
 /**
  * Mock log entry generator for testing
- */
+  */
 export class MockLogGenerator {
   private sequenceNumber: number = 0;
   private baseTimestamp: Date = new Date();
@@ -22,7 +22,7 @@ export class MockLogGenerator {
 
   /**
    * Generate a single mock log entry
-   */
+    */
   generateLogEntry(overrides: Partial<LogEntry> = {}): LogEntry {
     this.sequenceNumber++;
 
@@ -54,14 +54,14 @@ export class MockLogGenerator {
 
   /**
    * Generate multiple log entries
-   */
+    */
   generateLogEntries(count: number, baseOverrides: Partial<LogEntry> = {}): LogEntry[] {
     return Array.from({ length: count }, () => this.generateLogEntry(baseOverrides));
   }
 
   /**
    * Generate log entries with specific patterns for testing
-   */
+    */
   generatePatternedLogs(patterns: {
     errorBurst?: { count: number; timeSpanMs: number };
     serviceLoad?: { service: string; requestsPerSecond: number; durationSeconds: number };
@@ -230,7 +230,7 @@ export class MockLogGenerator {
 
 /**
  * Mock logger implementation for testing
- */
+  */
 export class MockLogger extends EventEmitter {
   private logs: LogEntry[] = [];
   private config: {
@@ -325,11 +325,11 @@ export class MockLogger extends EventEmitter {
 
 /**
  * Test assertion utilities for logging
- */
+  */
 export class LoggingTestAssertions {
   /**
    * Assert that a logger has logged a specific message
-   */
+    */
   static assertHasLogWithMessage(logger: MockLogger, expectedMessage: string, level?: LogLevel): void {
     const logs = level ? logger.getLogsByLevel(level) : logger.getLogs();
     const hasMessage = logs.some(log => log.message.includes(expectedMessage));
@@ -344,7 +344,7 @@ export class LoggingTestAssertions {
 
   /**
    * Assert log count
-   */
+    */
   static assertLogCount(logger: MockLogger, expectedCount: number, level?: LogLevel): void {
     const actualCount = level ? logger.getLogsByLevel(level).length : logger.getLogCount();
 
@@ -357,7 +357,7 @@ export class LoggingTestAssertions {
 
   /**
    * Assert that logs are properly correlated
-   */
+    */
   static assertLogsAreCorrelated(logs: LogEntry[], correlationId: string): void {
     const correlatedLogs = logs.filter(log => log.correlationId === correlationId);
 
@@ -375,7 +375,7 @@ export class LoggingTestAssertions {
 
   /**
    * Assert log performance metrics
-   */
+    */
   static assertLogPerformance(logs: LogEntry[], maxDuration: number): void {
     const slowLogs = logs.filter(log =>
       log.performance?.duration && log.performance.duration > maxDuration
@@ -391,7 +391,7 @@ export class LoggingTestAssertions {
 
   /**
    * Assert PII redaction
-   */
+    */
   static assertPIIRedacted(logs: LogEntry[], piiPatterns: RegExp[]): void {
     const logsWithPII: Array<{ log: LogEntry; pattern: RegExp; match: string }> = [];
 
@@ -418,11 +418,11 @@ export class LoggingTestAssertions {
 
 /**
  * Performance testing utilities for logging
- */
+  */
 export class LoggingPerformanceTests {
   /**
    * Test logging performance under load
-   */
+    */
   static async testLoggingThroughput(
     logger: MockLogger,
     messageCount: number,
@@ -472,7 +472,7 @@ export class LoggingPerformanceTests {
 
   /**
    * Test memory usage during sustained logging
-   */
+    */
   static async testMemoryUsage(
     logger: MockLogger,
     durationMs: number,
@@ -524,11 +524,11 @@ export class LoggingPerformanceTests {
 
 /**
  * Integration test helpers
- */
+  */
 export class LoggingIntegrationTestHelpers {
   /**
    * Create a complete test scenario with multiple services
-   */
+    */
   static async runMultiServiceScenario(loggers: Record<string, MockLogger>): Promise<{
     correlationId: string;
     logs: LogEntry[];
